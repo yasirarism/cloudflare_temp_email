@@ -12,8 +12,10 @@ import LocalAddress from './LocalAddress.vue'
 import AddressManagement from '../user/AddressManagement.vue'
 import { getRouterPathWithLang } from '../../utils'
 import AddressSelect from '../../components/AddressSelect.vue'
+import { useIsMobile } from '../../utils/composables'
 
 const router = useRouter()
+const isMobile = useIsMobile()
 
 const {
     jwt, settings, showAddressCredential, userJwt,
@@ -122,7 +124,8 @@ onMounted(async () => {
                 </n-collapse>
             </n-card>
         </n-modal>
-        <n-modal v-model:show="showAddressManage" preset="card" :title="t('addressManage')">
+        <n-modal v-model:show="showAddressManage" preset="card" :title="t('addressManage')"
+            :style="{ width: isMobile ? '92vw' : '720px', maxWidth: '720px' }">
             <TelegramAddress v-if="isTelegram" />
             <AddressManagement v-else-if="userJwt" />
             <LocalAddress v-else />

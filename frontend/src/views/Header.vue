@@ -257,7 +257,7 @@ onMounted(async () => {
                 </n-space>
             </template>
         </n-page-header>
-        <n-drawer v-model:show="showMobileMenu" placement="top" style="height: 100vh;">
+        <n-drawer v-model:show="showMobileMenu" placement="top" style="height: 60vh;">
             <n-drawer-content :title="t('menu')" closable>
                 <n-menu :options="menuOptions" />
             </n-drawer-content>

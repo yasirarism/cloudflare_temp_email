@@ -32,6 +32,7 @@ if (showAd.value) {
 }
 
 onMounted(async () => {
+  document.body.classList.add('glass-theme');
   try {
     await api.getUserSettings();
   } catch (error) {
@@ -158,14 +159,16 @@ body {
 .glass-shell .n-split,
 .glass-shell .n-split-pane,
 .glass-shell .n-drawer-content,
-.glass-shell .n-modal,
-.glass-shell .n-dropdown-menu,
-.glass-shell .n-select-menu,
-.glass-shell .n-popover,
-.glass-shell .n-popconfirm,
-.glass-shell .n-message,
-.glass-shell .n-notification,
-.glass-shell .n-dialog {
+.glass-shell .n-menu,
+.glass-theme .n-modal,
+.glass-theme .n-dropdown-menu,
+.glass-theme .n-select-menu,
+.glass-theme .n-popover,
+.glass-theme .n-popconfirm,
+.glass-theme .n-message,
+.glass-theme .n-notification,
+.glass-theme .n-dialog,
+.glass-theme .n-base-selection {
   background: var(--glass-bg) !important;
   border: 1px solid var(--glass-border) !important;
   box-shadow: var(--glass-shadow);
@@ -173,9 +176,18 @@ body {
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
 
-.glass-shell .n-button {
+.glass-shell .n-button,
+.glass-theme .n-button {
   background: var(--glass-button-bg) !important;
   border: 1px solid var(--glass-button-border) !important;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));

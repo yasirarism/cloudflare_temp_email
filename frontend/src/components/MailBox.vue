@@ -209,7 +209,7 @@ const setupAutoRefresh = async (autoRefresh) => {
       autoRefreshInterval.value--;
       if (autoRefreshInterval.value <= 0) {
         autoRefreshInterval.value = configAutoRefreshInterval.value;
-        await backFirstPageAndRefresh();
+        await backFirstPageAndRefresh({ showLoading: false, preserveSelection: true });
       }
     }, 1000)
   } else {
@@ -274,9 +274,9 @@ const refresh = async ({ showLoading = true, preserveSelection = true } = {}) =>
   }
 };
 
-const backFirstPageAndRefresh = async () => {
+const backFirstPageAndRefresh = async ({ showLoading = true, preserveSelection = true } = {}) => {
   page.value = 1;
-  await refresh();
+  await refresh({ showLoading, preserveSelection });
 }
 
 const checkForNewMail = async () => {
