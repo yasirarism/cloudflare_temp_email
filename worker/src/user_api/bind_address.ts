@@ -209,9 +209,30 @@ const UserBindAddressModule = {
         if (!db_user_id) {
             return c.text(msgs.AddressNotBindedMsg, 400)
         }
-        const { success } = await c.env.DB.prepare(
-            `UPDATE address SET public_access = ? WHERE id = ?`
-        ).bind(public_access ? 1 : 0, address_id).run();
+        let success = false;
+        try {
+            const result = await c.env.DB.prepare(
+                `UPDATE address SET public_access = ? WHERE id = ?`
+            ).bind(public_access ? 1 : 0, address_id).run();
+            success = result.success;
+        } catch (error) {
+            const message = (error as Error).message || "";
+            if (message.includes("public_access")) {
+                try {
+                    await c.env.DB.exec(
+                        `ALTER TABLE address ADD COLUMN public_access INTEGER DEFAULT 0;`
+                    );
+                    const result = await c.env.DB.prepare(
+                        `UPDATE address SET public_access = ? WHERE id = ?`
+                    ).bind(public_access ? 1 : 0, address_id).run();
+                    success = result.success;
+                } catch (innerError) {
+                    console.error(innerError);
+                }
+            } else {
+                console.error(error);
+            }
+        }
         if (!success) {
             return c.text(msgs.OperationFailedMsg, 500)
         }

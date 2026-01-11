@@ -124,7 +124,7 @@ api.post('/api/new_address', async (c) => {
         return c.text(msgs.NewAddressDisabledMsg, 403)
     }
     // eslint-disable-next-line prefer-const
-    let { name, domain, cf_token } = await c.req.json();
+    let { name, domain, cf_token, public_access } = await c.req.json();
     // check cf turnstile
     try {
         await checkCfTurnstile(c, cf_token);
@@ -161,7 +161,8 @@ api.post('/api/new_address', async (c) => {
             enablePrefix: true,
             checkLengthByConfig: true,
             addressPrefix,
-            sourceMeta
+            sourceMeta,
+            publicAccess: !!public_access,
         });
         return c.json(res);
     } catch (e) {

@@ -125,6 +125,7 @@ export const newAddress = async (
         checkAllowDomains = true,
         enableCheckNameRegex = true,
         sourceMeta = null,
+        publicAccess = false,
     }: {
         name: string, domain: string | undefined | null,
         enablePrefix: boolean,
@@ -133,6 +134,7 @@ export const newAddress = async (
         checkAllowDomains?: boolean,
         enableCheckNameRegex?: boolean,
         sourceMeta?: string | undefined | null,
+        publicAccess?: boolean,
     }
 ): Promise<{ address: string, jwt: string, password?: string | null }> => {
     const msgs = i18n.getMessagesbyContext(c);
@@ -183,29 +185,49 @@ export const newAddress = async (
     }
     // create address
     name = name + "@" + domain;
+    let inserted = false;
     try {
         // Try insert with source_meta field first
         const result = await c.env.DB.prepare(
-            `INSERT INTO address(name, source_meta) VALUES(?, ?)`
-        ).bind(name, sourceMeta).run();
+            `INSERT INTO address(name, source_meta, public_access) VALUES(?, ?, ?)`
+        ).bind(name, sourceMeta, publicAccess ? 1 : 0).run();
         if (!result.success) {
             throw new Error(msgs.FailedCreateAddressMsg)
         }
+        inserted = true;
         await updateAddressUpdatedAt(c, name);
     } catch (e) {
         const message = (e as Error).message;
-        // Fallback: source_meta field may not exist, try without it
-        if (message && message.includes("source_meta")) {
+        // Fallback: public_access/source_meta field may not exist, try without it
+        if (!inserted && message && message.includes("public_access")) {
+            try {
+                const result = await c.env.DB.prepare(
+                    `INSERT INTO address(name, source_meta) VALUES(?, ?)`
+                ).bind(name, sourceMeta).run();
+                if (!result.success) {
+                    throw new Error(msgs.FailedCreateAddressMsg)
+                }
+                inserted = true;
+                await updateAddressUpdatedAt(c, name);
+            } catch (innerError) {
+                const innerMessage = (innerError as Error).message;
+                if (!innerMessage || !innerMessage.includes("source_meta")) {
+                    throw innerError;
+                }
+            }
+        }
+        if (!inserted && message && message.includes("source_meta")) {
             const result = await c.env.DB.prepare(
                 `INSERT INTO address(name) VALUES(?)`
             ).bind(name).run();
             if (!result.success) {
                 throw new Error(msgs.FailedCreateAddressMsg)
             }
+            inserted = true;
             await updateAddressUpdatedAt(c, name);
-        } else if (message && message.includes("UNIQUE")) {
+        } else if (!inserted && message && message.includes("UNIQUE")) {
             throw new Error(msgs.AddressAlreadyExistsMsg)
-        } else {
+        } else if (!inserted) {
             throw new Error(msgs.FailedCreateAddressMsg)
         }
     }

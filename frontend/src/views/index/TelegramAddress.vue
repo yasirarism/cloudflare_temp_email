@@ -52,7 +52,7 @@ const fetchData = async () => {
     }
 }
 
-const newAddressPath = async (address_name: string, domain: string, cf_token: string) => {
+const newAddressPath = async (address_name: string, domain: string, cf_token: string, _public_access: boolean) => {
     return await api.fetch("/telegram/new_address", {
         method: "POST",
         body: JSON.stringify({
