@@ -1,0 +1,1 @@
+ALTER TABLE address ADD COLUMN public_access INTEGER DEFAULT 0;

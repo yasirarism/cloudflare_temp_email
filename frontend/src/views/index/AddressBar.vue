@@ -33,6 +33,10 @@ const { locale, t } = useI18n({
             addressPassword: 'Address Password',
             userLogin: 'User Login',
             addressManage: 'Manage',
+            publicAccess: 'Public access enabled',
+            publicAccessDisabled: 'Public access is disabled for this address.',
+            privateAccess: 'Private (JWT)',
+            publicAccessLabel: 'Public (Address)',
         },
         zh: {
             ok: '确定',
@@ -43,6 +47,10 @@ const { locale, t } = useI18n({
             addressPassword: '地址密码',
             userLogin: '用户登录',
             addressManage: '地址管理',
+            publicAccess: '已启用公开访问',
+            publicAccessDisabled: '该地址未启用公开访问。',
+            privateAccess: '私有 (JWT)',
+            publicAccessLabel: '公开 (地址)',
         }
     }
 });
@@ -120,9 +128,16 @@ onMounted(async () => {
             <span>
                 <p>{{ t("addressCredentialTip") }}</p>
             </span>
+            <n-alert v-if="settings.public_access" type="success" :show-icon="false" :bordered="false"
+                style="margin-bottom: 12px;">
+                {{ t('publicAccess') }}
+            </n-alert>
+            <n-alert v-else type="warning" :show-icon="false" :bordered="false" style="margin-bottom: 12px;">
+                {{ t('publicAccessDisabled') }}
+            </n-alert>
             <n-radio-group v-model:value="accessMode" size="small" style="margin-bottom: 12px;">
-                <n-radio value="private">Private (JWT)</n-radio>
-                <n-radio value="public">Public (Address)</n-radio>
+                <n-radio value="private">{{ t('privateAccess') }}</n-radio>
+                <n-radio value="public" :disabled="!settings.public_access">{{ t('publicAccessLabel') }}</n-radio>
             </n-radio-group>
             <n-card embedded>
                 <b>{{ jwt }}</b>

@@ -61,11 +61,29 @@ api.get('/open_api/address_jwt', async (c) => {
     }
 
     const normalizedAddress = address.toLowerCase();
-    const addressId = await c.env.DB.prepare(
-        `SELECT id FROM address where name = ? `
-    ).bind(normalizedAddress).first("id");
+    let addressId: number | null | undefined = null;
+    let publicAccess = 0;
+    try {
+        const result = await c.env.DB.prepare(
+            `SELECT id, public_access FROM address where name = ? `
+        ).bind(normalizedAddress).first<{
+            id: number;
+            public_access: number | null;
+        }>();
+        addressId = result?.id;
+        publicAccess = result?.public_access ? 1 : 0;
+    } catch (error) {
+        console.warn("Failed to query public_access, fallback to legacy behavior", error);
+        addressId = await c.env.DB.prepare(
+            `SELECT id FROM address where name = ? `
+        ).bind(normalizedAddress).first("id");
+        publicAccess = 1;
+    }
     if (!addressId) {
         return c.text("Invalid address", 404);
+    }
+    if (!publicAccess) {
+        return c.text("Address is private", 403);
     }
     const jwt = await Jwt.sign({
         address: normalizedAddress,

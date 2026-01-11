@@ -152,6 +152,7 @@ const getSettings = async () => {
             address: res["address"],
             auto_reply: res["auto_reply"],
             send_balance: res["send_balance"],
+            public_access: !!res["public_access"],
         };
     } finally {
         settings.value.fetched = true;

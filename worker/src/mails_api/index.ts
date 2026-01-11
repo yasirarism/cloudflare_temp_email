@@ -97,9 +97,19 @@ api.get('/api/settings', async (c) => {
     const balance = is_no_limit_send_balance ? 99999 : await c.env.DB.prepare(
         `SELECT balance FROM address_sender where address = ? and enabled = 1`
     ).bind(address).first("balance");
+    let publicAccess = 0;
+    try {
+        const publicAccessResult = await c.env.DB.prepare(
+            `SELECT public_access FROM address where name = ? `
+        ).bind(address).first("public_access");
+        publicAccess = publicAccessResult ? 1 : 0;
+    } catch (error) {
+        console.warn("Failed to read public_access", error);
+    }
     return c.json({
         address: address,
         send_balance: balance || 0,
+        public_access: publicAccess,
     });
 })
 
