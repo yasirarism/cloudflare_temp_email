@@ -431,4 +431,12 @@ onMounted(async () => {
 .n-data-table {
     min-width: 800px;
 }
+
+@media (max-width: 720px) {
+    .n-menu :deep(.n-menu-item-content),
+    .n-menu :deep(.n-menu-item-content__title),
+    .n-menu :deep(.n-button__content) {
+        white-space: normal;
+    }
+}
 </style>

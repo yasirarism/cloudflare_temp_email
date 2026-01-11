@@ -149,6 +149,7 @@ const columns = [
     {
         title: t('publicAccess'),
         key: "public_access",
+        width: 180,
         render(row: any) {
             const accessValue = publicAccessMap.value[row.jwt];
             return h(NSwitch, {
@@ -241,6 +242,11 @@ const columns = [
     align-items: center;
 }
 
+.action-group :deep(.n-switch__checked),
+.action-group :deep(.n-switch__unchecked) {
+    white-space: nowrap;
+}
+
 .table-scroll {
     overflow: auto;
     max-height: 60vh;
@@ -288,6 +294,12 @@ const columns = [
 
     .n-data-table {
         min-width: 560px;
+    }
+
+    .action-group :deep(.n-switch__checked),
+    .action-group :deep(.n-switch__unchecked) {
+        max-width: 100%;
+        white-space: nowrap;
     }
 }
 </style>

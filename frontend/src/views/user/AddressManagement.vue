@@ -168,24 +168,14 @@ const columns = [
         title: t('mail_count'),
         key: "mail_count",
         render(row) {
-            return h(NBadge, {
-                value: row.mail_count,
-                'show-zero': true,
-                max: 99,
-                type: "success"
-            })
+            return h('span', { class: 'count-text' }, String(row.mail_count))
         }
     },
     {
         title: t('send_count'),
         key: "send_count",
         render(row) {
-            return h(NBadge, {
-                value: row.send_count,
-                'show-zero': true,
-                max: 99,
-                type: "success"
-            })
+            return h('span', { class: 'count-text' }, String(row.send_count))
         }
     },
     {
@@ -309,6 +299,10 @@ onMounted(async () => {
     word-break: break-word;
 }
 
+.count-text {
+    font-weight: 600;
+}
+
 @media (max-width: 720px) {
     .action-group {
         flex-direction: column;
@@ -326,6 +320,10 @@ onMounted(async () => {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .action-group :deep(.n-button) {
+        min-width: 0;
     }
 
     .address-cell {
