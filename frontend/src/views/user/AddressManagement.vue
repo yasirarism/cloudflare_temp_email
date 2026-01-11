@@ -283,4 +283,17 @@ onMounted(async () => {
     gap: 8px;
     align-items: center;
 }
+
+@media (max-width: 720px) {
+    .action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-group :deep(.n-button),
+    .action-group :deep(.n-switch) {
+        width: 100%;
+        justify-content: center;
+    }
+}
 </style>

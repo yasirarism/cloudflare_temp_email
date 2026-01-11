@@ -205,6 +205,21 @@ body,
   color: inherit;
 }
 
+.glass-theme .n-data-table,
+.glass-theme .n-data-table-base-table,
+.glass-theme .n-data-table .n-data-table-wrapper,
+.glass-theme .n-data-table .n-data-table-td,
+.glass-theme .n-data-table .n-data-table-th {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  color: inherit;
+}
+
+.glass-theme .n-data-table .n-data-table-td,
+.glass-theme .n-data-table .n-data-table-th {
+  border-bottom-color: var(--glass-border);
+}
+
 .glass-theme .n-menu-item-content--selected,
 .glass-theme .n-dropdown-option-body:hover,
 .glass-theme .n-select-option-body:hover {

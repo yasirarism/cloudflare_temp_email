@@ -158,7 +158,7 @@ const columns = [
         title: t('actions'),
         key: 'actions',
         render(row: any) {
-            return h('div', [
+            return h('div', { class: 'action-group' }, [
                 h(NPopconfirm,
                     {
                         onPositiveClick: () => {
@@ -221,3 +221,25 @@ const columns = [
         </n-tabs>
     </div>
 </template>
+
+<style scoped>
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+@media (max-width: 720px) {
+    .action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-group :deep(.n-button),
+    .action-group :deep(.n-switch) {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
