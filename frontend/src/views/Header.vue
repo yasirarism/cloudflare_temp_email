@@ -40,12 +40,15 @@ const authFunc = async () => {
     }
 }
 
+const stripLangPrefix = (path) => {
+    const normalized = path.replace(/^\/(en|id)(?=\/|$)/, '');
+    return normalized || '/';
+}
+
 const changeLocale = async (lang) => {
-    if (lang === 'id') {
-        await router.push(route.fullPath.replace('/en', ''));
-    } else {
-        await router.push(`/${lang}${route.fullPath}`);
-    }
+    const normalizedPath = stripLangPrefix(route.fullPath);
+    localStorage.setItem('locale', lang);
+    await router.push(getRouterPathWithLang(normalizedPath, lang));
 }
 
 const { locale, t } = useI18n({
@@ -60,6 +63,9 @@ const { locale, t } = useI18n({
             menu: 'Menu',
             user: 'User',
             ok: 'OK',
+            greetingMorning: 'Good morning',
+            greetingAfternoon: 'Good afternoon',
+            greetingEvening: 'Good evening',
         },
         id: {
             title: 'Cloudflare Email Sementara',
@@ -71,6 +77,9 @@ const { locale, t } = useI18n({
             menu: 'Menu',
             user: 'Pengguna',
             ok: 'OK',
+            greetingMorning: 'Selamat pagi',
+            greetingAfternoon: 'Selamat siang',
+            greetingEvening: 'Selamat malam',
         }
     }
 });
@@ -84,6 +93,7 @@ const menuOptions = computed(() => [
                 text: true,
                 size: "small",
                 type: menuValue.value == "home" ? "primary" : "default",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     await router.push(getRouterPathWithLang('/', locale.value));
@@ -103,6 +113,7 @@ const menuOptions = computed(() => [
                 text: true,
                 size: "small",
                 type: menuValue.value == "user" ? "primary" : "default",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     await router.push(getRouterPathWithLang("/user", locale.value));
@@ -124,6 +135,7 @@ const menuOptions = computed(() => [
                 text: true,
                 size: "small",
                 type: menuValue.value == "admin" ? "primary" : "default",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     loading.value = true;
@@ -146,6 +158,7 @@ const menuOptions = computed(() => [
             {
                 text: true,
                 size: "small",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: () => { toggleDark(); showMobileMenu.value = false; }
             },
@@ -164,6 +177,7 @@ const menuOptions = computed(() => [
             {
                 text: true,
                 size: "small",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     locale.value == 'id' ? await changeLocale('en') : await changeLocale('id');
@@ -185,6 +199,7 @@ const menuOptions = computed(() => [
             {
                 text: true,
                 size: "small",
+                class: "nav-button",
                 style: "width: 100%",
                 tag: "a",
                 target: "_blank",
@@ -231,14 +246,32 @@ onMounted(async () => {
     await api.getOpenSettings(message, notification);
     // make sure user_id is fetched
     if (!userSettings.value.user_id) await api.getUserSettings(message);
+    const hour = new Date().getHours();
+    const greeting =
+        hour >= 5 && hour < 12
+            ? t('greetingMorning')
+            : hour >= 12 && hour < 18
+                ? t('greetingAfternoon')
+                : t('greetingEvening');
+    const emailKey = userSettings.value.user_email || 'guest';
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const greetingKey = `greeting-${emailKey}-${todayKey}`;
+    if (!localStorage.getItem(greetingKey)) {
+        notification.success({
+            title: greeting,
+            content: openSettings.value.title || t('title'),
+            duration: 4000
+        });
+        localStorage.setItem(greetingKey, 'shown');
+    }
 });
 </script>
 
 <template>
-    <div>
+    <div class="header-shell">
         <n-page-header>
             <template #title>
-                <h3>{{ openSettings.title || t('title') }}</h3>
+                <h4 class="header-title">{{ openSettings.title || t('title') }}</h4>
             </template>
             <template #avatar>
                 <div @click="logoClick">
@@ -283,11 +316,34 @@ onMounted(async () => {
     justify-content: space-between;
 }
 
+.header-shell {
+    padding-top: 20px;
+}
+
+.n-page-header {
+    padding-top: 48px;
+    padding-bottom: 18px;
+}
+
+.n-page-header :deep(.n-page-header__avatar),
+.n-page-header :deep(.n-page-header__title) {
+    margin-top: 14px;
+}
+
 .menu-toggle {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 999px;
     padding: 2px 10px;
+}
+
+:deep(.nav-button) {
+    border-radius: 999px;
+    padding: 4px 12px;
+}
+
+:deep(.nav-button .n-button__content) {
+    gap: 8px;
 }
 
 .menu-toggle :deep(.n-button__content) {
@@ -314,5 +370,17 @@ onMounted(async () => {
 
 .n-form .n-button {
     margin-top: 10px;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+@media (max-width: 600px) {
+    .header-title {
+        font-size: 18px;
+    }
 }
 </style>

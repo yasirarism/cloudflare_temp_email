@@ -175,7 +175,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="userSettings.fetched">
+  <div v-if="userSettings.fetched" class="admin-page">
     <n-modal v-model:show="showAdminPasswordModal" :closable="false" :closeOnEsc="false" :maskClosable="false"
       preset="dialog" :title="t('accessHeader')">
       <p>{{ t('accessTip') }}</p>
@@ -318,5 +318,21 @@ onMounted(async () => {
 .n-pagination {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+.admin-page :deep(.n-button__content) {
+  color: inherit;
+}
+
+.admin-page :deep(.n-button__icon) {
+  color: inherit;
+}
+
+.admin-page :deep(.n-button) {
+  color: inherit;
+}
+
+.admin-page :deep(.n-tabs) {
+  margin-top: 12px;
 }
 </style>

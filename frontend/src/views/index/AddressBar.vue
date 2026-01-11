@@ -114,7 +114,7 @@ watch(jwt, (value) => {
             <n-skeleton style="height: 50vh" />
         </n-card>
         <div v-else-if="settings.address">
-            <n-alert type="info" :show-icon="false" :bordered="false">
+            <n-alert type="info" :show-icon="false" :bordered="false" class="glass-panel address-alert">
                 <AddressSelect>
                     <template #actions>
                         <n-button class="address-manage" size="small" tertiary type="primary"
@@ -130,7 +130,7 @@ watch(jwt, (value) => {
             <TelegramAddress />
         </div>
         <div v-else-if="userJwt" class="center">
-            <n-card :bordered="false" embedded style="max-width: 900px; width: 100%;">
+            <n-card :bordered="false" embedded style="max-width: none; width: 100%;">
                 <AddressManagement />
             </n-card>
         </div>
@@ -182,7 +182,7 @@ watch(jwt, (value) => {
             </n-card>
         </n-modal>
         <n-modal v-model:show="showAddressManage" preset="card" :title="t('addressManage')"
-            :style="{ width: isMobile ? '95vw' : '900px', maxWidth: '95vw' }">
+            class="address-manage-modal" :style="{ width: isMobile ? '95vw' : '100vw', maxWidth: '100vw' }">
             <TelegramAddress v-if="isTelegram" />
             <n-tabs v-else type="segment">
                 <n-tab-pane v-if="userJwt" name="user" :tab="t('manageUserAddresses')">
@@ -215,8 +215,19 @@ watch(jwt, (value) => {
     margin: 20px;
 }
 
+:deep(.address-manage-modal) {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+}
+
 .address-manage {
     flex: 0 0 auto;
     white-space: nowrap;
 }
+
+.address-alert {
+    padding: 12px;
+}
+
 </style>

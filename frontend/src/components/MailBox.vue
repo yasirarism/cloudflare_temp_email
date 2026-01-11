@@ -321,12 +321,17 @@ const clickRow = async (row) => {
     row.checked = !row.checked;
     return;
   }
-  curMail.value = row;
+  if (curMail.value?.id === row.id) {
+    return;
+  }
+  requestAnimationFrame(() => {
+    curMail.value = row;
+  });
 };
 
 
 const mailItemClass = (row) => {
-  return curMail.value && row.id == curMail.value.id ? (isDark.value ? 'overlay overlay-dark-backgroud' : 'overlay overlay-light-backgroud') : '';
+  return curMail.value && row.id == curMail.value.id ? 'mail-item-selected glass-panel' : '';
 };
 
 const deleteMail = async () => {
@@ -464,6 +469,13 @@ const triggerManualRefresh = async () => {
   }, 1200);
 }
 
+const drawerVisible = computed(() => !!curMail.value)
+const handleDrawerUpdate = (value) => {
+  if (!value) {
+    curMail.value = null
+  }
+}
+
 onMounted(async () => {
   await refresh();
   startRealtime();
@@ -529,8 +541,8 @@ onBeforeUnmount(() => {
         <template #1>
           <div style="overflow: auto; min-height: 50vh; max-height: 100vh;">
             <n-list hoverable clickable class="glass-panel">
-              <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
-                :class="mailItemClass(row)">
+            <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
+              :class="mailItemClass(row)">
                 <template #prefix v-if="multiActionMode">
                   <n-checkbox v-model:checked="row.checked" />
                 </template>
@@ -609,12 +621,13 @@ onBeforeUnmount(() => {
         </n-button>
       </n-space>
       <div v-if="showFilterInput" style="padding: 0 10px; margin-top: 8px; margin-bottom: 10px;">
-        <n-input v-model:value="localFilterKeyword"
+        <n-input v-model:value="localFilterKeyword" class="glass-input"
           :placeholder="t('keywordQueryTip')" size="small" clearable />
       </div>
       <div style="overflow: auto; height: 80vh;">
         <n-list hoverable clickable class="glass-panel">
-          <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
+          <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
+            :class="mailItemClass(row)">
             <n-thing :title="row.subject">
               <template #description>
                 <n-tag type="info">
@@ -639,7 +652,8 @@ onBeforeUnmount(() => {
           </n-list-item>
         </n-list>
       </div>
-      <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
+      <n-drawer :show="drawerVisible" @update:show="handleDrawerUpdate" width="100%" placement="bottom"
+        class="mail-drawer" :trap-focus="false" :block-scroll="false" :duration="160"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">
@@ -683,26 +697,49 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
-.overlay {
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-
-.overlay-dark-backgroud {
-  background-color: var(--glass-selection-bg);
-}
-
-.overlay-light-backgroud {
-  background-color: var(--glass-selection-bg);
-}
-
 .glass-panel {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.mail-item-selected {
+  background: var(--glass-selection-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+  border-radius: 8px;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.mail-item-selected :deep(.n-list-item__content),
+.mail-item-selected :deep(.n-list-item__main) {
+  background: var(--glass-selection-bg);
+}
+
+.glass-input {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-input :deep(.n-input__input),
+.glass-input :deep(.n-input__placeholder),
+.glass-input :deep(.n-input__suffix) {
+  color: inherit;
+}
+
+.mail-drawer :deep(.n-drawer-content) {
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .mail-item {

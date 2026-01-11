@@ -22,7 +22,7 @@ const { locale, t } = useI18n({
             mail_count: 'Mail Count',
             send_count: 'Send Count',
             actions: 'Actions',
-            changeMailAddress: 'Change Address',
+            openInbox: 'Open Inbox',
             unbindAddress: 'Unbind Address',
             unbindAddressTip: 'Before unbinding, please switch to this email address and save the email address credential.',
             transferAddress: 'Transfer Address',
@@ -33,6 +33,7 @@ const { locale, t } = useI18n({
             publicAccess: 'Public Access',
             publicAccessEnabled: 'Public',
             publicAccessDisabled: 'Private',
+            viewInbox: 'View Inbox',
         },
         zh: {
             success: '成功',
@@ -40,7 +41,7 @@ const { locale, t } = useI18n({
             mail_count: '邮件数量',
             send_count: '发送数量',
             actions: '操作',
-            changeMailAddress: '切换地址',
+            openInbox: '打开收件箱',
             unbindAddress: '解绑地址',
             unbindAddressTip: '解绑前请切换到此邮箱地址并保存邮箱地址凭证。',
             transferAddress: '转移地址',
@@ -51,6 +52,7 @@ const { locale, t } = useI18n({
             publicAccess: '公开访问',
             publicAccessEnabled: '公开',
             publicAccessDisabled: '私有',
+            viewInbox: '查看收件箱',
         }
     }
 });
@@ -64,7 +66,7 @@ const targetUserEmail = ref('')
 const changeMailAddress = async (address_id) => {
     try {
         const res = await api.fetch(`/user_api/bind_address_jwt/${address_id}`);
-        message.success(t('changeMailAddress') + " " + t('success'));
+        message.success(t('openInbox') + " " + t('success'));
         if (!res.jwt) {
             message.error("jwt not found");
             return;
@@ -156,6 +158,10 @@ const columns = [
     {
         title: t('name'),
         key: "name",
+        width: 240,
+        ellipsis: {
+            tooltip: true
+        },
         render(row) {
             return h('span', { class: 'address-cell' }, row.name)
         }
@@ -163,30 +169,35 @@ const columns = [
     {
         title: t('mail_count'),
         key: "mail_count",
+        width: 90,
+        align: 'center',
         render(row) {
-            return h(NBadge, {
-                value: row.mail_count,
-                'show-zero': true,
-                max: 99,
-                type: "success"
-            })
+            if (row.mail_count > 0) {
+                return h(NButton, {
+                    text: true,
+                    class: 'inbox-button',
+                    onClick: () => changeMailAddress(row.id),
+                }, {
+                    icon: () => h('span', { class: 'count-text' }, String(row.mail_count)),
+                    default: () => t('viewInbox')
+                })
+            }
+            return h('span', { class: 'count-text' }, String(row.mail_count))
         }
     },
     {
         title: t('send_count'),
         key: "send_count",
+        width: 90,
+        align: 'center',
         render(row) {
-            return h(NBadge, {
-                value: row.send_count,
-                'show-zero': true,
-                max: 99,
-                type: "success"
-            })
+            return h('span', { class: 'count-text' }, String(row.send_count))
         }
     },
     {
         title: t('actions'),
         key: 'actions',
+        width: 320,
         render(row) {
             return h('div', { class: 'action-group' }, [
                 h(NSwitch, {
@@ -206,9 +217,9 @@ const columns = [
                                 tertiary: true,
                                 type: "primary",
                             },
-                            { default: () => t('changeMailAddress') }
+                            { default: () => t('openInbox') }
                         ),
-                        default: () => `${t('changeMailAddress')}?`
+                        default: () => `${t('openInbox')}?`
                     }
                 ),
                 h(NButton,
@@ -264,7 +275,7 @@ onMounted(async () => {
         </n-modal>
         <n-tabs type="segment">
             <n-tab-pane name="address" :tab="t('address')">
-                <div style="overflow: auto;">
+                <div class="table-scroll">
                     <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
                 </div>
             </n-tab-pane>
@@ -276,8 +287,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.table-scroll {
+    overflow: auto;
+    max-height: 60vh;
+}
+
 .n-data-table {
-    min-width: 100%;
+    min-width: 760px;
 }
 
 .action-group {
@@ -287,12 +303,41 @@ onMounted(async () => {
     align-items: center;
 }
 
+.action-group :deep(.n-button) {
+    min-width: 0;
+    border-radius: 999px;
+}
+
+.inbox-button {
+    border-radius: 999px;
+}
+
+.inbox-button :deep(.n-button__content) {
+    gap: 6px;
+}
+
 .address-cell {
     display: inline-block;
-    max-width: 220px;
+    max-width: 240px;
     width: 100%;
     white-space: normal;
     word-break: break-word;
+}
+
+:deep(.count-text) {
+    align-items: center;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+    color: #fff;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    height: 28px;
+    justify-content: center;
+    min-width: 28px;
+    width: 28px;
+    padding: 0;
 }
 
 @media (max-width: 720px) {
@@ -308,14 +353,18 @@ onMounted(async () => {
     }
 
     .action-group :deep(.n-button__content) {
-        max-width: 120px;
+        max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
+    .action-group :deep(.n-button) {
+        min-width: 0;
+    }
+
     .address-cell {
-        max-width: 160px;
+        max-width: 200px;
     }
 }
 </style>

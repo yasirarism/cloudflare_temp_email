@@ -118,13 +118,14 @@ onMounted(async () => {
 
 <style>
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.28);
-  --glass-border: rgba(255, 255, 255, 0.45);
-  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-  --glass-selection-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  --glass-selection-bg: rgba(255, 255, 255, 0.5);
   --glass-backdrop-blur: 18px;
-  --glass-button-bg: rgba(255, 255, 255, 0.35);
-  --glass-button-border: rgba(255, 255, 255, 0.55);
+  --glass-button-bg: rgba(255, 255, 255, 0.65);
+  --glass-button-border: rgba(255, 255, 255, 0.75);
+  --glass-text-color: #0f172a;
   --app-bg-start: #e0f2fe;
   --app-bg-end: #f1f5f9;
 }
@@ -136,6 +137,7 @@ onMounted(async () => {
   --glass-selection-bg: rgba(30, 41, 59, 0.55);
   --glass-button-bg: rgba(30, 41, 59, 0.7);
   --glass-button-border: rgba(148, 163, 184, 0.25);
+  --glass-text-color: #f8fafc;
   --app-bg-start: #0f172a;
   --app-bg-end: #111827;
 }
@@ -146,6 +148,10 @@ body {
     radial-gradient(circle at bottom, rgba(125, 211, 252, 0.45), transparent 60%),
     linear-gradient(135deg, var(--app-bg-start), var(--app-bg-end));
   background-attachment: fixed;
+}
+
+.glass-theme {
+  color: var(--glass-text-color);
 }
 
 html,
@@ -192,6 +198,29 @@ body,
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-theme .n-button .n-button__content,
+.glass-theme .n-button .n-button__icon {
+  color: var(--glass-text-color) !important;
+}
+
+.glass-theme .n-input__input,
+.glass-theme .n-input__placeholder,
+.glass-theme .n-base-selection-label,
+.glass-theme .n-form-item-label__text,
+.glass-theme .n-menu-item-content,
+.glass-theme .n-menu-item-content__title,
+.glass-theme .n-data-table,
+.glass-theme .n-data-table .n-data-table-td,
+.glass-theme .n-data-table .n-data-table-th,
+.glass-theme .n-pagination,
+.glass-theme .n-alert,
+.glass-theme .n-card,
+.glass-theme .n-tag,
+.glass-theme .n-result,
+.glass-theme .n-result .n-result-header {
+  color: var(--glass-text-color);
 }
 
 .glass-theme .n-menu-item-content,
@@ -267,6 +296,8 @@ body,
   height: 100vh;
   text-align: center;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .n-grid {

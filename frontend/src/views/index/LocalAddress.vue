@@ -23,6 +23,8 @@ const { t } = useI18n({
             actions: 'Actions',
             changeMailAddress: 'Change Mail Address',
             unbindMailAddress: 'Unbind Mail Address credential',
+            clearLocal: 'Clear Local Addresses',
+            clearLocalTip: 'Clear all locally stored addresses?',
             create_or_bind: 'Create or Bind',
             bindAddressSuccess: 'Bind Address Success',
             publicAccess: 'Public Access',
@@ -36,6 +38,8 @@ const { t } = useI18n({
             actions: 'Aksi',
             changeMailAddress: 'Ganti Alamat',
             unbindMailAddress: 'Lepas Kredensial Alamat',
+            clearLocal: 'Hapus Alamat Lokal',
+            clearLocalTip: 'Hapus semua alamat lokal?',
             create_or_bind: 'Buat atau Kaitkan',
             bindAddressSuccess: 'Berhasil mengaitkan alamat',
             publicAccess: 'Akses Publik',
@@ -133,11 +137,21 @@ const bindAddress = async () => {
     }
 }
 
+const clearLocalAddresses = () => {
+    localAddressCache.value = [];
+    publicAccessMap.value = {};
+    publicAccessLoading.value = {};
+}
+
 const columns = [
     {
         title: t('address'),
         key: "address"
         ,
+        width: 240,
+        ellipsis: {
+            tooltip: true
+        },
         render(row: any) {
             return h('span', { class: 'address-cell' }, row.address)
         }
@@ -145,6 +159,7 @@ const columns = [
     {
         title: t('publicAccess'),
         key: "public_access",
+        width: 180,
         render(row: any) {
             const accessValue = publicAccessMap.value[row.jwt];
             return h(NSwitch, {
@@ -161,6 +176,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 260,
         render(row: any) {
             return h('div', { class: 'action-group' }, [
                 h(NPopconfirm,
@@ -215,9 +231,17 @@ const columns = [
         <n-alert type="warning" :show-icon="false" :bordered="false">
             <span class="local-address-tip">{{ t('tip') }}</span>
         </n-alert>
+        <n-popconfirm @positive-click="clearLocalAddresses">
+            <template #trigger>
+                <n-button size="small" tertiary type="warning">{{ t('clearLocal') }}</n-button>
+            </template>
+            {{ t('clearLocalTip') }}
+        </n-popconfirm>
         <n-tabs type="segment" v-model:value="tabValue">
             <n-tab-pane name="address" :tab="t('address')">
-                <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+                <div class="table-scroll">
+                    <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+                </div>
             </n-tab-pane>
             <n-tab-pane name="create_or_bind" :tab="t('create_or_bind')">
                 <Login :bindUserAddress="bindAddress" />
@@ -234,14 +258,32 @@ const columns = [
     align-items: center;
 }
 
+.action-group :deep(.n-switch__checked),
+.action-group :deep(.n-switch__unchecked) {
+    white-space: nowrap;
+}
+
+.table-scroll {
+    overflow: auto;
+    max-height: 60vh;
+}
+
+.n-data-table {
+    min-width: 520px;
+}
+
 .local-address-tip {
     display: inline-block;
     word-break: break-word;
 }
 
+.local-address-tip + :deep(.n-popconfirm) {
+    margin-top: 8px;
+}
+
 .address-cell {
     display: inline-block;
-    max-width: 220px;
+    max-width: 240px;
     width: 100%;
     white-space: normal;
     word-break: break-word;
@@ -260,14 +302,24 @@ const columns = [
     }
 
     .action-group :deep(.n-button__content) {
-        max-width: 120px;
+        max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .address-cell {
-        max-width: 160px;
+        max-width: 200px;
+    }
+
+    .n-data-table {
+        min-width: 560px;
+    }
+
+    .action-group :deep(.n-switch__checked),
+    .action-group :deep(.n-switch__unchecked) {
+        max-width: 100%;
+        white-space: nowrap;
     }
 }
 </style>
