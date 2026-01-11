@@ -68,6 +68,7 @@ const {
   autoRefresh, configAutoRefreshInterval, sendMailModel
 } = useGlobalState()
 const autoRefreshInterval = ref(configAutoRefreshInterval.value)
+const pageRefreshOptions = ref(null)
 const rawData = ref([])
 const timer = ref(null)
 const realtimeTimer = ref(null)
@@ -234,7 +235,9 @@ watch(autoRefresh, async (autoRefresh, old) => {
 
 watch([page, pageSize], async ([page, pageSize], [oldPage, oldPageSize]) => {
   if (page !== oldPage || pageSize !== oldPageSize) {
-    await refresh();
+    const options = pageRefreshOptions.value || undefined;
+    pageRefreshOptions.value = null;
+    await refresh(options);
   }
 })
 
@@ -275,8 +278,12 @@ const refresh = async ({ showLoading = true, preserveSelection = true } = {}) =>
 };
 
 const backFirstPageAndRefresh = async ({ showLoading = true, preserveSelection = true } = {}) => {
+  if (page.value === 1) {
+    await refresh({ showLoading, preserveSelection });
+    return;
+  }
+  pageRefreshOptions.value = { showLoading, preserveSelection };
   page.value = 1;
-  await refresh({ showLoading, preserveSelection });
 }
 
 const checkForNewMail = async () => {

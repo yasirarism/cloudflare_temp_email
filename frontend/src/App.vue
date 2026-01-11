@@ -148,6 +148,12 @@ body {
   background-attachment: fixed;
 }
 
+html,
+body,
+#app {
+  height: 100%;
+}
+
 .glass-shell {
   padding: 0;
 }
@@ -160,6 +166,9 @@ body {
 .glass-shell .n-split-pane,
 .glass-shell .n-drawer-content,
 .glass-shell .n-menu,
+.glass-theme .n-modal-body-wrapper,
+.glass-theme .n-modal-body,
+.glass-theme .n-drawer-content,
 .glass-theme .n-modal,
 .glass-theme .n-dropdown-menu,
 .glass-theme .n-select-menu,
@@ -185,12 +194,44 @@ body {
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
 
+.glass-theme .n-menu-item-content,
+.glass-theme .n-dropdown-option,
+.glass-theme .n-select-option,
+.glass-theme .n-base-selection-label {
+  background: transparent;
+  color: inherit;
+}
+
+.glass-theme .n-menu-item-content--selected,
+.glass-theme .n-dropdown-option-body:hover,
+.glass-theme .n-select-option-body:hover {
+  background: var(--glass-selection-bg);
+}
+
+.glass-theme .n-message__content,
+.glass-theme .n-notification-main,
+.glass-theme .n-dialog__content {
+  color: inherit;
+}
+
+.glass-theme .n-switch__rail {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-theme .n-switch__button {
+  background: var(--glass-button-bg);
+  border: 1px solid var(--glass-button-border);
+}
+
 .glass-panel {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+  color: inherit;
 }
 
 .n-switch {
