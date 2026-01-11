@@ -138,6 +138,10 @@ const columns = [
         title: t('address'),
         key: "address"
         ,
+        width: 320,
+        ellipsis: {
+            tooltip: true
+        },
         render(row: any) {
             return h('span', { class: 'address-cell' }, row.address)
         }
@@ -241,7 +245,7 @@ const columns = [
 
 .address-cell {
     display: inline-block;
-    max-width: 220px;
+    max-width: 320px;
     width: 100%;
     white-space: normal;
     word-break: break-word;
@@ -260,14 +264,14 @@ const columns = [
     }
 
     .action-group :deep(.n-button__content) {
-        max-width: 120px;
+        max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .address-cell {
-        max-width: 160px;
+        max-width: 240px;
     }
 }
 </style>

@@ -284,8 +284,13 @@ onMounted(async () => {
 }
 
 .n-page-header {
-    padding-top: 18px;
-    padding-bottom: 8px;
+    padding-top: 28px;
+    padding-bottom: 12px;
+}
+
+.n-page-header :deep(.n-page-header__avatar),
+.n-page-header :deep(.n-page-header__title) {
+    margin-top: 6px;
 }
 
 .menu-toggle {

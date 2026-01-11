@@ -256,6 +256,10 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
     flex: 1 1 0;
 }
 
+.address-actions {
+    flex: 0 0 auto;
+}
+
 .address-copy {
     flex: 0 0 auto;
     white-space: nowrap;
@@ -286,14 +290,17 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
     }
 
     .address-select {
+        order: 1;
         flex: 1 1 100%;
     }
 
     .address-actions {
+        order: 2;
         flex: 0 0 auto;
     }
 
     .address-copy {
+        order: 3;
         flex: 1 1 100%;
         justify-content: center;
     }
