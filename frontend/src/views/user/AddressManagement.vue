@@ -156,7 +156,7 @@ const columns = [
     {
         title: t('name'),
         key: "name",
-        width: 280,
+        width: 240,
         ellipsis: {
             tooltip: true
         },
@@ -268,7 +268,7 @@ onMounted(async () => {
         </n-modal>
         <n-tabs type="segment">
             <n-tab-pane name="address" :tab="t('address')">
-                <div style="overflow: auto;">
+                <div class="table-scroll">
                     <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
                 </div>
             </n-tab-pane>
@@ -280,8 +280,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.table-scroll {
+    overflow: auto;
+    max-height: 60vh;
+}
+
 .n-data-table {
-    min-width: 100%;
+    min-width: 520px;
 }
 
 .action-group {
@@ -297,7 +302,7 @@ onMounted(async () => {
 
 .address-cell {
     display: inline-block;
-    max-width: 320px;
+    max-width: 240px;
     width: 100%;
     white-space: normal;
     word-break: break-word;
@@ -323,7 +328,7 @@ onMounted(async () => {
     }
 
     .address-cell {
-        max-width: 220px;
+        max-width: 200px;
     }
 }
 </style>

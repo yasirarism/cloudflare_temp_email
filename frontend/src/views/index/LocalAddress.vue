@@ -138,7 +138,7 @@ const columns = [
         title: t('address'),
         key: "address"
         ,
-        width: 320,
+        width: 240,
         ellipsis: {
             tooltip: true
         },
@@ -221,7 +221,9 @@ const columns = [
         </n-alert>
         <n-tabs type="segment" v-model:value="tabValue">
             <n-tab-pane name="address" :tab="t('address')">
-                <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+                <div class="table-scroll">
+                    <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+                </div>
             </n-tab-pane>
             <n-tab-pane name="create_or_bind" :tab="t('create_or_bind')">
                 <Login :bindUserAddress="bindAddress" />
@@ -238,6 +240,15 @@ const columns = [
     align-items: center;
 }
 
+.table-scroll {
+    overflow: auto;
+    max-height: 60vh;
+}
+
+.n-data-table {
+    min-width: 520px;
+}
+
 .local-address-tip {
     display: inline-block;
     word-break: break-word;
@@ -245,7 +256,7 @@ const columns = [
 
 .address-cell {
     display: inline-block;
-    max-width: 320px;
+    max-width: 240px;
     width: 100%;
     white-space: normal;
     word-break: break-word;
@@ -271,7 +282,7 @@ const columns = [
     }
 
     .address-cell {
-        max-width: 240px;
+        max-width: 200px;
     }
 }
 </style>
