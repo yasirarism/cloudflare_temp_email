@@ -235,7 +235,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
+    <div class="header-shell">
         <n-page-header>
             <template #title>
                 <h4 class="header-title">{{ openSettings.title || t('title') }}</h4>
@@ -281,6 +281,10 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.header-shell {
+    padding-top: 24px;
 }
 
 .n-page-header {
