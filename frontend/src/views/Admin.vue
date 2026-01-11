@@ -324,6 +324,14 @@ onMounted(async () => {
   color: inherit;
 }
 
+.admin-page :deep(.n-button__icon) {
+  color: inherit;
+}
+
+.admin-page :deep(.n-button) {
+  color: inherit;
+}
+
 .admin-page :deep(.n-tabs) {
   margin-top: 12px;
 }

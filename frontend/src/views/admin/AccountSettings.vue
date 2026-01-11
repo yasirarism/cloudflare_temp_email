@@ -104,6 +104,7 @@ const emailForwardingColumns = [
     {
         title: t('domain_list'),
         key: 'domains',
+        width: 220,
         render: (row, index) => {
             return h(NSelect, {
                 value: Array.isArray(row.domains) ? row.domains : [],
@@ -121,6 +122,7 @@ const emailForwardingColumns = [
     {
         title: t('source_patterns'),
         key: 'sourcePatterns',
+        width: 260,
         render: (row, index) => {
             return h('div', { style: 'display: flex; flex-direction: column; gap: 4px;' }, [
                 h(NSelect, {
@@ -154,6 +156,7 @@ const emailForwardingColumns = [
     {
         title: t('forward_address'),
         key: 'forward',
+        width: 220,
         render: (row, index) => {
             return h(NInput, {
                 value: row.forward,
@@ -167,6 +170,7 @@ const emailForwardingColumns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 120,
         render: (row, index) => {
             return h('div', { style: 'display: flex; gap: 8px;' }, [
                 h(NPopconfirm, {
@@ -401,6 +405,6 @@ onMounted(async () => {
 }
 
 .forwarding-table :deep(.n-data-table) {
-    min-width: 720px;
+    min-width: 820px;
 }
 </style>

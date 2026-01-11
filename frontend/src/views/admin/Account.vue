@@ -354,6 +354,7 @@ const columns = [
     {
         title: t('mail_count'),
         key: "mail_count",
+        width: 140,
         render(row) {
             return h(NButton,
                 {
@@ -375,6 +376,7 @@ const columns = [
     {
         title: t('send_count'),
         key: "send_count",
+        width: 140,
         render(row) {
             return h(NButton,
                 {
