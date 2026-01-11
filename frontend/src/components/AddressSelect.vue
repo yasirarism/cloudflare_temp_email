@@ -233,7 +233,7 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
     <n-flex class="address-row" align="center" justify="center" :wrap="true">
         <n-select v-model:value="addressValue" :options="addressOptions" :size="size" filterable
             :loading="addressLoading" :placeholder="t('address')" @update:value="onAddressChange"
-            class="address-select" />
+            class="address-select glass-select" />
         <slot name="actions" />
         <n-button v-if="showCopy" class="address-copy" @click="copy" :size="size" tertiary type="primary">
             <n-icon :component="Copy" /> {{ t('copy') }}
@@ -256,5 +256,13 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
 .address-copy {
     flex: 0 0 auto;
     white-space: nowrap;
+}
+
+.glass-select {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
 </style>

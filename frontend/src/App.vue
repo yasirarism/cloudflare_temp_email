@@ -194,6 +194,11 @@ body,
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
 
+.glass-theme .n-button .n-button__content,
+.glass-theme .n-button .n-button__icon {
+  color: var(--n-text-color) !important;
+}
+
 .glass-theme .n-menu-item-content,
 .glass-theme .n-dropdown-option,
 .glass-theme .n-select-option,

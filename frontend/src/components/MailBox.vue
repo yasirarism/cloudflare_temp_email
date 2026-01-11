@@ -609,7 +609,7 @@ onBeforeUnmount(() => {
         </n-button>
       </n-space>
       <div v-if="showFilterInput" style="padding: 0 10px; margin-top: 8px; margin-bottom: 10px;">
-        <n-input v-model:value="localFilterKeyword"
+        <n-input v-model:value="localFilterKeyword" class="glass-input"
           :placeholder="t('keywordQueryTip')" size="small" clearable />
       </div>
       <div style="overflow: auto; height: 80vh;">
@@ -703,6 +703,20 @@ onBeforeUnmount(() => {
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-input {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-input :deep(.n-input__input),
+.glass-input :deep(.n-input__placeholder),
+.glass-input :deep(.n-input__suffix) {
+  color: inherit;
 }
 
 .mail-item {
