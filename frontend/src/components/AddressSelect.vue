@@ -265,4 +265,27 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
     backdrop-filter: blur(var(--glass-backdrop-blur));
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
+
+.glass-select :deep(.n-base-selection-label) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+    .address-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .address-select {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .address-copy {
+        width: 100%;
+        justify-content: center;
+    }
+}
 </style>

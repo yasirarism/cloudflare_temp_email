@@ -326,7 +326,7 @@ const clickRow = async (row) => {
 
 
 const mailItemClass = (row) => {
-  return curMail.value && row.id == curMail.value.id ? (isDark.value ? 'overlay overlay-dark-backgroud' : 'overlay overlay-light-backgroud') : '';
+  return curMail.value && row.id == curMail.value.id ? 'mail-item-selected glass-panel' : '';
 };
 
 const deleteMail = async () => {
@@ -529,8 +529,8 @@ onBeforeUnmount(() => {
         <template #1>
           <div style="overflow: auto; min-height: 50vh; max-height: 100vh;">
             <n-list hoverable clickable class="glass-panel">
-              <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
-                :class="mailItemClass(row)">
+            <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
+              :class="mailItemClass(row)">
                 <template #prefix v-if="multiActionMode">
                   <n-checkbox v-model:checked="row.checked" />
                 </template>
@@ -614,7 +614,8 @@ onBeforeUnmount(() => {
       </div>
       <div style="overflow: auto; height: 80vh;">
         <n-list hoverable clickable class="glass-panel">
-          <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
+          <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
+            :class="mailItemClass(row)">
             <n-thing :title="row.subject">
               <template #description>
                 <n-tag type="info">
@@ -683,26 +684,18 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
-.overlay {
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-
-.overlay-dark-backgroud {
-  background-color: var(--glass-selection-bg);
-}
-
-.overlay-light-backgroud {
-  background-color: var(--glass-selection-bg);
-}
-
 .glass-panel {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.mail-item-selected {
+  background: var(--glass-selection-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .glass-input {

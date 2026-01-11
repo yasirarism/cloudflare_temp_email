@@ -223,4 +223,11 @@ watch(jwt, (value) => {
 .address-alert {
     padding: 12px;
 }
+
+@media (max-width: 600px) {
+    .address-manage {
+        width: 100%;
+        justify-content: center;
+    }
+}
 </style>
