@@ -93,6 +93,7 @@ const menuOptions = computed(() => [
                 text: true,
                 size: "small",
                 type: menuValue.value == "home" ? "primary" : "default",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     await router.push(getRouterPathWithLang('/', locale.value));
@@ -112,6 +113,7 @@ const menuOptions = computed(() => [
                 text: true,
                 size: "small",
                 type: menuValue.value == "user" ? "primary" : "default",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     await router.push(getRouterPathWithLang("/user", locale.value));
@@ -133,6 +135,7 @@ const menuOptions = computed(() => [
                 text: true,
                 size: "small",
                 type: menuValue.value == "admin" ? "primary" : "default",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     loading.value = true;
@@ -155,6 +158,7 @@ const menuOptions = computed(() => [
             {
                 text: true,
                 size: "small",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: () => { toggleDark(); showMobileMenu.value = false; }
             },
@@ -173,6 +177,7 @@ const menuOptions = computed(() => [
             {
                 text: true,
                 size: "small",
+                class: "nav-button",
                 style: "width: 100%",
                 onClick: async () => {
                     locale.value == 'id' ? await changeLocale('en') : await changeLocale('id');
@@ -194,6 +199,7 @@ const menuOptions = computed(() => [
             {
                 text: true,
                 size: "small",
+                class: "nav-button",
                 style: "width: 100%",
                 tag: "a",
                 target: "_blank",
@@ -329,6 +335,10 @@ onMounted(async () => {
     border: 1px solid var(--glass-border);
     border-radius: 999px;
     padding: 2px 10px;
+}
+
+.nav-button {
+    border-radius: 999px;
 }
 
 .menu-toggle :deep(.n-button__content) {

@@ -167,6 +167,8 @@ const columns = [
     {
         title: t('mail_count'),
         key: "mail_count",
+        width: 90,
+        align: 'center',
         render(row) {
             return h('span', { class: 'count-text' }, String(row.mail_count))
         }
@@ -174,6 +176,8 @@ const columns = [
     {
         title: t('send_count'),
         key: "send_count",
+        width: 90,
+        align: 'center',
         render(row) {
             return h('span', { class: 'count-text' }, String(row.send_count))
         }
@@ -181,7 +185,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
-        width: 260,
+        width: 320,
         render(row) {
             return h('div', { class: 'action-group' }, [
                 h(NSwitch, {
@@ -277,7 +281,7 @@ onMounted(async () => {
 }
 
 .n-data-table {
-    min-width: 520px;
+    min-width: 760px;
 }
 
 .action-group {
@@ -289,6 +293,7 @@ onMounted(async () => {
 
 .action-group :deep(.n-button) {
     min-width: 0;
+    border-radius: 999px;
 }
 
 .address-cell {
