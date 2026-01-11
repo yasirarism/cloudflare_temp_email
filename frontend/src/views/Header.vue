@@ -339,6 +339,11 @@ onMounted(async () => {
 
 :deep(.nav-button) {
     border-radius: 999px;
+    padding: 4px 12px;
+}
+
+:deep(.nav-button .n-button__content) {
+    gap: 8px;
 }
 
 .menu-toggle :deep(.n-button__content) {

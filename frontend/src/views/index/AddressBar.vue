@@ -130,7 +130,7 @@ watch(jwt, (value) => {
             <TelegramAddress />
         </div>
         <div v-else-if="userJwt" class="center">
-            <n-card :bordered="false" embedded style="max-width: 900px; width: 100%;">
+            <n-card :bordered="false" embedded style="max-width: none; width: 100%;">
                 <AddressManagement />
             </n-card>
         </div>
@@ -182,7 +182,7 @@ watch(jwt, (value) => {
             </n-card>
         </n-modal>
         <n-modal v-model:show="showAddressManage" preset="card" :title="t('addressManage')"
-            :style="{ width: isMobile ? '95vw' : '900px', maxWidth: '95vw' }">
+            :style="{ width: isMobile ? '95vw' : '90vw', maxWidth: '95vw' }">
             <TelegramAddress v-if="isTelegram" />
             <n-tabs v-else type="segment">
                 <n-tab-pane v-if="userJwt" name="user" :tab="t('manageUserAddresses')">
