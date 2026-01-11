@@ -212,5 +212,42 @@ api.delete('/api/clear_sent_items', async (c) => {
     })
 })
 
+api.post('/api/address_visibility', async (c) => {
+    const msgs = i18n.getMessagesbyContext(c);
+    const { address } = c.get("jwtPayload")
+    const { public_access } = await c.req.json();
+    if (typeof public_access !== "boolean") {
+        return c.text(msgs.InvalidAddressMsg, 400)
+    }
+    let success = false;
+    try {
+        const result = await c.env.DB.prepare(
+            `UPDATE address SET public_access = ? WHERE name = ?`
+        ).bind(public_access ? 1 : 0, address).run();
+        success = result.success;
+    } catch (error) {
+        const message = (error as Error).message || "";
+        if (message.includes("public_access")) {
+            try {
+                await c.env.DB.exec(
+                    `ALTER TABLE address ADD COLUMN public_access INTEGER DEFAULT 0;`
+                );
+                const result = await c.env.DB.prepare(
+                    `UPDATE address SET public_access = ? WHERE name = ?`
+                ).bind(public_access ? 1 : 0, address).run();
+                success = result.success;
+            } catch (innerError) {
+                console.error(innerError);
+            }
+        } else {
+            console.error(error);
+        }
+    }
+    if (!success) {
+        return c.text(msgs.OperationFailedMsg, 500)
+    }
+    return c.json({ success: true })
+})
+
 api.post('/api/address_change_password', address_auth.changePassword)
 api.post('/api/address_login', address_auth.login)

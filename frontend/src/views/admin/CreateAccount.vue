@@ -22,6 +22,7 @@ const { t } = useI18n({
             addressCredentialTip: 'Please copy the Mail Address Credential and you can use it to login to your email account.',
             addressPassword: 'Address Password',
             linkWithAddressCredential: 'Open to auto login email link',
+            publicAccess: 'Public access',
         },
         zh: {
             address: '地址',
@@ -33,6 +34,7 @@ const { t } = useI18n({
             addressCredentialTip: '请复制邮箱地址凭证，你可以使用它登录你的邮箱。',
             addressPassword: '地址密码',
             linkWithAddressCredential: '打开即可自动登录邮箱的链接',
+            publicAccess: '公开访问',
         }
     }
 });
@@ -40,6 +42,7 @@ const { t } = useI18n({
 const enablePrefix = ref(true)
 const emailName = ref("")
 const emailDomain = ref("")
+const publicAccess = ref(false)
 const showReultModal = ref(false)
 const result = ref("")
 const addressPassword = ref("")
@@ -57,6 +60,7 @@ const newEmail = async () => {
                 enablePrefix: enablePrefix.value,
                 name: emailName.value,
                 domain: emailDomain.value,
+                public_access: publicAccess.value,
             })
         })
         result.value = res["jwt"];
@@ -64,6 +68,7 @@ const newEmail = async () => {
         createdAddress.value = res["address"] || '';
         message.success(t('successTip'))
         showReultModal.value = true
+        publicAccess.value = false
     } catch (error) {
         message.error(error.message || "error");
     }
@@ -118,6 +123,9 @@ onMounted(async () => {
                     <n-select v-model:value="emailDomain" :consistent-menu-width="false"
                         :options="openSettings.domains" />
                 </n-input-group>
+            </n-form-item-row>
+            <n-form-item-row :label="t('publicAccess')">
+                <n-switch v-model:value="publicAccess" :round="false" />
             </n-form-item-row>
             <n-button @click="newEmail" type="primary" block :loading="loading">
                 {{ t('creatNewEmail') }}
