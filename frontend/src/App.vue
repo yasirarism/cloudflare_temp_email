@@ -90,9 +90,9 @@ onMounted(async () => {
               </div>
             </n-gi>
             <n-gi :span="!showSideMargin ? gridMaxCols : (gridMaxCols - 2)">
-              <div class="main">
+              <div class="main glass-shell">
                 <n-space vertical>
-                  <n-layout style="min-height: 80vh;">
+                  <n-layout class="glass-surface" style="min-height: 80vh;">
                     <Header />
                     <router-view></router-view>
                   </n-layout>
@@ -116,6 +116,49 @@ onMounted(async () => {
 
 
 <style>
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.28);
+  --glass-border: rgba(255, 255, 255, 0.45);
+  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  --glass-selection-bg: rgba(255, 255, 255, 0.25);
+  --glass-backdrop-blur: 18px;
+  --app-bg-start: #e0f2fe;
+  --app-bg-end: #f1f5f9;
+}
+
+.dark {
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(148, 163, 184, 0.25);
+  --glass-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+  --glass-selection-bg: rgba(30, 41, 59, 0.55);
+  --app-bg-start: #0f172a;
+  --app-bg-end: #111827;
+}
+
+body {
+  background: radial-gradient(circle at top, var(--app-bg-start), transparent 55%),
+    radial-gradient(circle at bottom, rgba(125, 211, 252, 0.45), transparent 60%),
+    linear-gradient(135deg, var(--app-bg-start), var(--app-bg-end));
+  background-attachment: fixed;
+}
+
+.glass-shell {
+  padding: 16px;
+}
+
+.glass-surface,
+.glass-shell .n-card,
+.glass-shell .n-tabs-nav,
+.glass-shell .n-list,
+.glass-shell .n-drawer-content,
+.glass-shell .n-modal {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
 .n-switch {
   margin-left: 10px;
   margin-right: 10px;

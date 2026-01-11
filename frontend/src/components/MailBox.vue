@@ -54,6 +54,11 @@ const props = defineProps({
     default: false,
     required: false
   },
+  enableRealtime: {
+    type: Boolean,
+    default: true,
+    required: false
+  },
 })
 
 const localFilterKeyword = ref('')
@@ -65,6 +70,10 @@ const {
 const autoRefreshInterval = ref(configAutoRefreshInterval.value)
 const rawData = ref([])
 const timer = ref(null)
+const realtimeTimer = ref(null)
+const latestMailId = ref(null)
+const processedCache = new Map()
+const realtimeIntervalMs = 5000
 
 const count = ref(0)
 const page = ref(1)
@@ -209,6 +218,16 @@ const setupAutoRefresh = async (autoRefresh) => {
   }
 }
 
+const buildProcessedItem = async (item) => {
+  const cached = processedCache.get(item.id);
+  if (cached && cached.raw === item.raw) {
+    return { ...cached, checked: false };
+  }
+  const processed = await processItem({ ...item });
+  processedCache.set(item.id, processed);
+  return { ...processed, checked: false };
+}
+
 watch(autoRefresh, async (autoRefresh, old) => {
   setupAutoRefresh(autoRefresh)
 }, { immediate: true })
@@ -219,28 +238,39 @@ watch([page, pageSize], async ([page, pageSize], [oldPage, oldPageSize]) => {
   }
 })
 
-const refresh = async () => {
+const refresh = async ({ showLoading = true, preserveSelection = true } = {}) => {
+  if (showLoading) {
+    loading.value = true;
+  }
   try {
     const { results, count: totalCount } = await props.fetchMailData(
       pageSize.value, (page.value - 1) * pageSize.value
     );
-    loading.value = true;
-    rawData.value = await Promise.all(results.map(async (item) => {
-      item.checked = false;
-      return await processItem(item);
-    }));
-    if (totalCount > 0) {
+    const processedResults = await Promise.all(
+      results.map(async (item) => buildProcessedItem(item))
+    );
+    rawData.value = processedResults;
+    if (typeof totalCount === 'number' && totalCount >= 0) {
       count.value = totalCount;
     }
-    curMail.value = null;
-    if (!isMobile.value && data.value.length > 0) {
-      curMail.value = data.value[0];
+    if (processedResults.length > 0) {
+      latestMailId.value = processedResults[0].id;
+    }
+    if (preserveSelection && curMail.value) {
+      const updatedSelection = processedResults.find(mail => mail.id === curMail.value.id);
+      curMail.value = updatedSelection || (!isMobile.value ? processedResults[0] || null : null);
+    } else {
+      curMail.value = !isMobile.value && processedResults.length > 0
+        ? processedResults[0]
+        : null;
     }
   } catch (error) {
     message.error(error.message || "error");
     console.error(error);
   } finally {
-    loading.value = false;
+    if (showLoading) {
+      loading.value = false;
+    }
   }
 };
 
@@ -248,6 +278,35 @@ const backFirstPageAndRefresh = async () => {
   page.value = 1;
   await refresh();
 }
+
+const checkForNewMail = async () => {
+  if (!props.enableRealtime || autoRefresh.value || loading.value || page.value !== 1) {
+    return;
+  }
+  try {
+    const { results, count: totalCount } = await props.fetchMailData(1, 0);
+    if (typeof totalCount === 'number' && totalCount >= 0) {
+      count.value = totalCount;
+    }
+    const latestId = results?.[0]?.id || null;
+    if (latestId && latestId !== latestMailId.value) {
+      await refresh({ showLoading: false, preserveSelection: false });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const startRealtime = () => {
+  clearInterval(realtimeTimer.value);
+  realtimeTimer.value = null;
+  if (!props.enableRealtime || autoRefresh.value) {
+    return;
+  }
+  realtimeTimer.value = setInterval(checkForNewMail, realtimeIntervalMs);
+}
+
+watch([() => props.enableRealtime, autoRefresh], startRealtime, { immediate: true })
 
 const clickRow = async (row) => {
   if (multiActionMode.value) {
@@ -387,10 +446,12 @@ const multiActionDownload = async () => {
 
 onMounted(async () => {
   await refresh();
+  startRealtime();
 });
 
 onBeforeUnmount(() => {
   clearInterval(timer.value)
+  clearInterval(realtimeTimer.value)
 })
 </script>
 
@@ -609,11 +670,11 @@ onBeforeUnmount(() => {
 }
 
 .overlay-dark-backgroud {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--glass-selection-bg);
 }
 
 .overlay-light-backgroud {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--glass-selection-bg);
 }
 
 .mail-item {
