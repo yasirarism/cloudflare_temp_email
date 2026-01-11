@@ -233,8 +233,10 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
     <n-flex class="address-row" align="center" justify="center" :wrap="true">
         <n-select v-model:value="addressValue" :options="addressOptions" :size="size" filterable
             :loading="addressLoading" :placeholder="t('address')" @update:value="onAddressChange"
-            class="address-select" />
-        <slot name="actions" />
+            class="address-select glass-select" />
+        <div class="address-actions">
+            <slot name="actions" />
+        </div>
         <n-button v-if="showCopy" class="address-copy" @click="copy" :size="size" tertiary type="primary">
             <n-icon :component="Copy" /> {{ t('copy') }}
         </n-button>
@@ -245,16 +247,63 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
 .address-row {
     width: 100%;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .address-select {
-    min-width: 220px;
-    max-width: 420px;
-    flex: 1 1 220px;
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 240px;
+}
+
+.address-actions {
+    flex: 0 0 auto;
 }
 
 .address-copy {
     flex: 0 0 auto;
     white-space: nowrap;
+}
+
+.glass-select {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-select :deep(.n-base-selection-label) {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.address-row :deep(.n-base-selection) {
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .address-row {
+        flex-wrap: wrap;
+    }
+
+    .address-select {
+        order: 1;
+        flex: 1 1 calc(100% - 120px);
+    }
+
+    .address-actions {
+        order: 2;
+        flex: 0 0 auto;
+        align-self: center;
+    }
+
+    .address-copy {
+        order: 3;
+        flex: 1 1 100%;
+        justify-content: center;
+    }
 }
 </style>

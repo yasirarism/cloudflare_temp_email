@@ -114,7 +114,7 @@ watch(jwt, (value) => {
             <n-skeleton style="height: 50vh" />
         </n-card>
         <div v-else-if="settings.address">
-            <n-alert type="info" :show-icon="false" :bordered="false">
+            <n-alert type="info" :show-icon="false" :bordered="false" class="glass-panel address-alert">
                 <AddressSelect>
                     <template #actions>
                         <n-button class="address-manage" size="small" tertiary type="primary"
@@ -219,4 +219,9 @@ watch(jwt, (value) => {
     flex: 0 0 auto;
     white-space: nowrap;
 }
+
+.address-alert {
+    padding: 12px;
+}
+
 </style>

@@ -104,6 +104,7 @@ const emailForwardingColumns = [
     {
         title: t('domain_list'),
         key: 'domains',
+        width: 220,
         render: (row, index) => {
             return h(NSelect, {
                 value: Array.isArray(row.domains) ? row.domains : [],
@@ -121,6 +122,7 @@ const emailForwardingColumns = [
     {
         title: t('source_patterns'),
         key: 'sourcePatterns',
+        width: 260,
         render: (row, index) => {
             return h('div', { style: 'display: flex; flex-direction: column; gap: 4px;' }, [
                 h(NSelect, {
@@ -154,6 +156,7 @@ const emailForwardingColumns = [
     {
         title: t('forward_address'),
         key: 'forward',
+        width: 220,
         render: (row, index) => {
             return h(NInput, {
                 value: row.forward,
@@ -167,6 +170,7 @@ const emailForwardingColumns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 120,
         render: (row, index) => {
             return h('div', { style: 'display: flex; gap: 8px;' }, [
                 h(NPopconfirm, {
@@ -296,7 +300,7 @@ onMounted(async () => {
                 <span>{{ t("tip") }}</span>
             </n-alert>
             <n-flex justify="end">
-                <n-button @click="save" type="primary" :loading="loading">
+                <n-button @click="save" type="primary" :loading="loading" class="admin-save">
                     {{ t('save') }}
                 </n-button>
             </n-flex>
@@ -370,9 +374,13 @@ onMounted(async () => {
             <n-space justify="end">
                 <n-button @click="addNewEmailForwardingItem">{{ t('add') }}</n-button>
             </n-space>
-            <n-data-table :columns="emailForwardingColumns" :data="emailForwardingList" :bordered="false" striped />
+            <div class="forwarding-table">
+                <n-data-table :columns="emailForwardingColumns" :data="emailForwardingList" :bordered="false" striped />
+            </div>
             <n-space justify="end">
-                <n-button @click="saveEmailForwardingConfig" type="primary">{{ t('save') }}</n-button>
+                <n-button @click="saveEmailForwardingConfig" type="primary" class="admin-save">
+                    {{ t('save') }}
+                </n-button>
             </n-space>
         </n-space>
     </n-modal>
@@ -385,5 +393,18 @@ onMounted(async () => {
     place-items: center;
     justify-content: center;
     margin: 20px;
+}
+
+.admin-save :deep(.n-button__content) {
+    color: inherit;
+}
+
+.forwarding-table {
+    overflow: auto;
+    max-width: 100%;
+}
+
+.forwarding-table :deep(.n-data-table) {
+    min-width: 820px;
 }
 </style>

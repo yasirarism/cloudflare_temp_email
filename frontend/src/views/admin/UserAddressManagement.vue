@@ -1,7 +1,6 @@
 <script setup>
 import { ref, h, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n'
-import { NBadge } from 'naive-ui'
 
 import { api } from '../../api'
 
@@ -54,24 +53,14 @@ const columns = [
         title: t('mail_count'),
         key: "mail_count",
         render(row) {
-            return h(NBadge, {
-                value: row.mail_count,
-                'show-zero': true,
-                max: 99,
-                type: "success"
-            })
+            return h('span', { class: 'count-text' }, String(row.mail_count))
         }
     },
     {
         title: t('send_count'),
         key: "send_count",
         render(row) {
-            return h(NBadge, {
-                value: row.send_count,
-                'show-zero': true,
-                max: 99,
-                type: "success"
-            })
+            return h('span', { class: 'count-text' }, String(row.send_count))
         }
     }
 ]
@@ -90,5 +79,21 @@ onMounted(async () => {
 <style scoped>
 .n-data-table {
     min-width: 700px;
+}
+
+:deep(.count-text) {
+    align-items: center;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+    color: #fff;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    height: 28px;
+    justify-content: center;
+    min-width: 28px;
+    width: 28px;
+    padding: 0;
 }
 </style>

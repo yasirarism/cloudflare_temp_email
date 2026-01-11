@@ -1,6 +1,6 @@
 <script setup>
 import { ref, h, onMounted, watch, computed } from 'vue';
-import { NBadge, useMessage, NSwitch } from 'naive-ui'
+import { useMessage, NSwitch } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import { useGlobalState } from '../../store'
@@ -328,27 +328,33 @@ const columns = [
     },
     {
         title: "ID",
-        key: "id"
+        key: "id",
+        width: 100
     },
     {
         title: t('name'),
-        key: "name"
+        key: "name",
+        width: 200
     },
     {
         title: t('created_at'),
-        key: "created_at"
+        key: "created_at",
+        width: 180
     },
     {
         title: t('updated_at'),
-        key: "updated_at"
+        key: "updated_at",
+        width: 180
     },
     {
         title: t('source_meta'),
-        key: "source_meta"
+        key: "source_meta",
+        width: 200
     },
     {
         title: t('mail_count'),
         key: "mail_count",
+        width: 140,
         render(row) {
             return h(NButton,
                 {
@@ -361,12 +367,7 @@ const columns = [
                     }
                 },
                 {
-                    icon: () => h(NBadge, {
-                        value: row.mail_count,
-                        'show-zero': true,
-                        max: 99,
-                        type: "success"
-                    }),
+                    icon: () => h('span', { class: 'count-text' }, String(row.mail_count)),
                     default: () => row.mail_count > 0 ? t('viewMails') : ""
                 }
             )
@@ -375,6 +376,7 @@ const columns = [
     {
         title: t('send_count'),
         key: "send_count",
+        width: 140,
         render(row) {
             return h(NButton,
                 {
@@ -387,12 +389,7 @@ const columns = [
                     }
                 },
                 {
-                    icon: () => h(NBadge, {
-                        value: row.send_count,
-                        'show-zero': true,
-                        max: 99,
-                        type: "success"
-                    }),
+                    icon: () => h('span', { class: 'count-text' }, String(row.send_count)),
                     default: () => row.send_count > 0 ? t('viewSendBox') : ""
                 }
             )
@@ -401,6 +398,7 @@ const columns = [
     {
         title: t('publicAccess'),
         key: 'public_access',
+        width: 180,
         render(row) {
             return h(NSwitch, {
                 value: !!row.public_access,
@@ -414,6 +412,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 220,
         render(row) {
             return h('div', [
                 h(NMenu, {
@@ -578,7 +577,7 @@ onMounted(async () => {
                 </n-button>
             </template>
         </n-modal>
-        <n-input-group style="margin-bottom: 10px;">
+        <n-input-group class="admin-account-actions" style="margin-bottom: 10px;">
             <n-input v-model:value="addressQuery" clearable :placeholder="t('addressQueryTip')"
                 @keydown.enter="fetchData" />
             <n-button @click="fetchData" type="primary" tertiary>
@@ -586,7 +585,7 @@ onMounted(async () => {
             </n-button>
         </n-input-group>
 
-        <n-space v-if="showMultiActionBar" style="margin-bottom: 10px;">
+        <n-space v-if="showMultiActionBar" class="admin-account-actions" style="margin-bottom: 10px;">
             <n-button @click="multiActionSelectAll" tertiary>
                 {{ t('selectAll') }}
             </n-button>
@@ -615,7 +614,7 @@ onMounted(async () => {
                 {{ t('selectedItems') }}: {{ selectedCount }}
             </n-tag>
         </n-space>
-        <div style="overflow: auto;">
+        <div class="admin-account-table" style="overflow: auto;">
             <div style="display: inline-block;">
                 <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count"
                     :page-sizes="[20, 50, 100]" show-size-picker>
@@ -650,5 +649,55 @@ onMounted(async () => {
 
 .n-data-table {
     min-width: 1000px;
+}
+
+.admin-account-actions :deep(.n-input),
+.admin-account-actions :deep(.n-input__input-el) {
+    border-radius: 999px;
+}
+
+.admin-account-actions :deep(.n-input) {
+    border-color: rgba(34, 197, 94, 0.6);
+}
+
+:deep(.count-text) {
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+    color: #fff;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 28px;
+    height: 28px;
+    width: 28px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.admin-account-actions :deep(.n-button) {
+    border-radius: 999px;
+}
+
+.admin-account-actions :deep(.n-button--primary) {
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+}
+
+.admin-account-table :deep(.n-button) {
+    border-radius: 999px;
+}
+
+.n-switch :deep(.n-switch__checked),
+.n-switch :deep(.n-switch__unchecked) {
+    white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+    .n-menu :deep(.n-menu-item-content),
+    .n-menu :deep(.n-menu-item-content__title),
+    .n-menu :deep(.n-button__content) {
+        white-space: normal;
+    }
 }
 </style>

@@ -6,7 +6,7 @@ import {
 
 export const useGlobalState = createGlobalState(
     () => {
-        const isDark = useDark()
+        const isDark = useDark({ initialValue: 'dark' })
         const toggleDark = useToggle(isDark)
         const loading = ref(false);
         const announcement = useLocalStorage('announcement', '');
