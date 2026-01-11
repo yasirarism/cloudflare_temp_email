@@ -83,7 +83,10 @@ onMounted(async () => {
     <n-spin description="loading..." :show="loading">
       <n-notification-provider container-style="margin-top: 60px;">
         <n-message-provider container-style="margin-top: 20px;">
-          <n-grid x-gap="12" :cols="gridMaxCols">
+          <div class="app-shell">
+            <div class="app-ambient app-ambient-left"></div>
+            <div class="app-ambient app-ambient-right"></div>
+            <n-grid x-gap="12" :cols="gridMaxCols">
             <n-gi v-if="showSideMargin" span="1">
               <div class="side" v-if="showAd">
                 <ins class="adsbygoogle" style="display:block" :data-ad-client="adClient" :data-ad-slot="adSlot"
@@ -107,7 +110,8 @@ onMounted(async () => {
                   data-ad-format="auto" data-full-width-responsive="true"></ins>
               </div>
             </n-gi>
-          </n-grid>
+            </n-grid>
+          </div>
           <n-back-top />
         </n-message-provider>
       </n-notification-provider>
@@ -156,6 +160,35 @@ body,
 
 .glass-shell {
   padding: 0;
+}
+
+.app-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 32px 16px 48px;
+}
+
+.app-ambient {
+  position: absolute;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.app-ambient-left {
+  top: -4rem;
+  left: 10%;
+  background: rgba(59, 130, 246, 0.35);
+}
+
+.app-ambient-right {
+  bottom: -6rem;
+  right: 15%;
+  background: rgba(168, 85, 247, 0.35);
 }
 
 .glass-surface,

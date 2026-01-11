@@ -40,6 +40,7 @@ const { locale, t } = useI18n({
             manageUserAddresses: 'User Addresses',
             manageLocalAddresses: 'Local Addresses',
             publicAccessPrivate: 'This address is private. Please use the JWT access link.',
+            publicAccessPrivateLoggedIn: 'This address is private. You are already logged in with another address.',
             publicAccessNotFound: 'Address not found.',
             publicAccessFailed: 'Failed to access public address.',
         },
@@ -59,6 +60,7 @@ const { locale, t } = useI18n({
             manageUserAddresses: '用户地址',
             manageLocalAddresses: '本地地址',
             publicAccessPrivate: '该地址为私有，请使用 JWT 访问链接。',
+            publicAccessPrivateLoggedIn: '该地址为私有，你当前已登录其他地址。',
             publicAccessNotFound: '未找到该地址。',
             publicAccessFailed: '公开地址访问失败。',
         }
@@ -104,6 +106,7 @@ watch(jwt, (value) => {
     <div>
         <n-alert v-if="publicAccessError" type="warning" :show-icon="false" :bordered="false">
             <span v-if="publicAccessError === 'private'">{{ t('publicAccessPrivate') }}</span>
+            <span v-else-if="publicAccessError === 'privateLoggedIn'">{{ t('publicAccessPrivateLoggedIn') }}</span>
             <span v-else-if="publicAccessError === 'notFound'">{{ t('publicAccessNotFound') }}</span>
             <span v-else>{{ t('publicAccessFailed') }}</span>
         </n-alert>

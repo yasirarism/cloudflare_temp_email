@@ -74,7 +74,7 @@ router.beforeEach(async (to, from, next) => {
             console.error(error);
             const errorMessage = error?.message || '';
             if (errorMessage.includes('Address is private') || errorMessage.includes('403')) {
-                publicAccessError.value = 'private';
+                publicAccessError.value = jwt.value ? 'privateLoggedIn' : 'private';
             } else if (errorMessage.includes('Invalid address') || errorMessage.includes('404')) {
                 publicAccessError.value = 'notFound';
             } else {
