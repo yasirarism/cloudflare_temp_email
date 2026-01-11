@@ -696,6 +696,13 @@ onBeforeUnmount(() => {
   background: var(--glass-selection-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.mail-item-selected :deep(.n-list-item__content),
+.mail-item-selected :deep(.n-list-item__main) {
+  background: transparent;
 }
 
 .glass-input {

@@ -224,10 +224,4 @@ watch(jwt, (value) => {
     padding: 12px;
 }
 
-@media (max-width: 600px) {
-    .address-manage {
-        width: 100%;
-        justify-content: center;
-    }
-}
 </style>

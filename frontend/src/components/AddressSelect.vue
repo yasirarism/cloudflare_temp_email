@@ -230,7 +230,7 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
 </script>
 
 <template>
-    <n-flex class="address-row" align="center" justify="center" :wrap="true">
+    <n-flex class="address-row" align="center" justify="center" :wrap="false">
         <n-select v-model:value="addressValue" :options="addressOptions" :size="size" filterable
             :loading="addressLoading" :placeholder="t('address')" @update:value="onAddressChange"
             class="address-select glass-select" />
@@ -245,10 +245,11 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
 .address-row {
     width: 100%;
     gap: 10px;
+    flex-wrap: nowrap;
 }
 
 .address-select {
-    min-width: 220px;
+    min-width: 0;
     max-width: 420px;
     flex: 1 1 220px;
 }
@@ -267,25 +268,9 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
 }
 
 .glass-select :deep(.n-base-selection-label) {
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-@media (max-width: 600px) {
-    .address-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .address-select {
-        max-width: 100%;
-        width: 100%;
-    }
-
-    .address-copy {
-        width: 100%;
-        justify-content: center;
-    }
 }
 </style>

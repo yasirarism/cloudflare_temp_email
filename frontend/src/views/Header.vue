@@ -238,7 +238,7 @@ onMounted(async () => {
     <div>
         <n-page-header>
             <template #title>
-                <h3>{{ openSettings.title || t('title') }}</h3>
+                <h4 class="header-title">{{ openSettings.title || t('title') }}</h4>
             </template>
             <template #avatar>
                 <div @click="logoClick">
@@ -314,5 +314,17 @@ onMounted(async () => {
 
 .n-form .n-button {
     margin-top: 10px;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+@media (max-width: 600px) {
+    .header-title {
+        font-size: 18px;
+    }
 }
 </style>
