@@ -29,18 +29,18 @@ const { t } = useI18n({
             publicAccessEnabled: 'Public',
             publicAccessDisabled: 'Private',
         },
-        zh: {
-            tip: '这些地址存储在您的浏览器中，如果您清除浏览器缓存，可能会丢失。',
-            success: '成功',
-            address: '地址',
-            actions: '操作',
-            changeMailAddress: '切换邮箱地址',
-            unbindMailAddress: '解绑邮箱地址',
-            create_or_bind: '创建或绑定',
-            bindAddressSuccess: '绑定地址成功',
-            publicAccess: '公开访问',
-            publicAccessEnabled: '公开',
-            publicAccessDisabled: '私有',
+        id: {
+            tip: 'Alamat ini disimpan di browser Anda dan bisa hilang jika cache browser dihapus.',
+            success: 'berhasil',
+            address: 'Alamat',
+            actions: 'Aksi',
+            changeMailAddress: 'Ganti Alamat',
+            unbindMailAddress: 'Lepas Kredensial Alamat',
+            create_or_bind: 'Buat atau Kaitkan',
+            bindAddressSuccess: 'Berhasil mengaitkan alamat',
+            publicAccess: 'Akses Publik',
+            publicAccessEnabled: 'Publik',
+            publicAccessDisabled: 'Private',
         }
     }
 });
@@ -213,7 +213,7 @@ const columns = [
 <template>
     <div>
         <n-alert type="warning" :show-icon="false" :bordered="false">
-            <span>{{ t('tip') }}</span>
+            <span class="local-address-tip">{{ t('tip') }}</span>
         </n-alert>
         <n-tabs type="segment" v-model:value="tabValue">
             <n-tab-pane name="address" :tab="t('address')">
@@ -232,6 +232,11 @@ const columns = [
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
+}
+
+.local-address-tip {
+    display: inline-block;
+    word-break: break-word;
 }
 
 .address-cell {

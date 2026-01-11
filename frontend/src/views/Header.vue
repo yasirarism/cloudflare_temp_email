@@ -41,7 +41,7 @@ const authFunc = async () => {
 }
 
 const changeLocale = async (lang) => {
-    if (lang == 'zh') {
+    if (lang === 'id') {
         await router.push(route.fullPath.replace('/en', ''));
     } else {
         await router.push(`/${lang}${route.fullPath}`);
@@ -61,16 +61,16 @@ const { locale, t } = useI18n({
             user: 'User',
             ok: 'OK',
         },
-        zh: {
-            title: 'Cloudflare 临时邮件',
-            dark: '暗色',
-            light: '亮色',
-            accessHeader: '访问密码',
-            accessTip: '请输入站点访问密码',
-            home: '主页',
-            menu: '菜单',
-            user: '用户',
-            ok: '确定',
+        id: {
+            title: 'Cloudflare Email Sementara',
+            dark: 'Gelap',
+            light: 'Terang',
+            accessHeader: 'Kata Sandi Akses',
+            accessTip: 'Masukkan kata sandi akses yang benar',
+            home: 'Beranda',
+            menu: 'Menu',
+            user: 'Pengguna',
+            ok: 'OK',
         }
     }
 });
@@ -166,12 +166,12 @@ const menuOptions = computed(() => [
                 size: "small",
                 style: "width: 100%",
                 onClick: async () => {
-                    locale.value == 'zh' ? await changeLocale('en') : await changeLocale('zh');
+                    locale.value == 'id' ? await changeLocale('en') : await changeLocale('id');
                     showMobileMenu.value = false;
                 }
             },
             {
-                default: () => locale.value == 'zh' ? "English" : "中文",
+                default: () => locale.value == 'id' ? "English" : "Indonesia",
                 icon: () => h(
                     NIcon, { component: Language }
                 )

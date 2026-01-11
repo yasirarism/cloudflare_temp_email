@@ -455,6 +455,15 @@ const multiActionDownload = async () => {
   }
 }
 
+const manualRefreshSpin = ref(false)
+const triggerManualRefresh = async () => {
+  manualRefreshSpin.value = true;
+  await backFirstPageAndRefresh({ showLoading: true, preserveSelection: true });
+  setTimeout(() => {
+    manualRefreshSpin.value = false;
+  }, 1200);
+}
+
 onMounted(async () => {
   await refresh();
   startRealtime();
@@ -501,13 +510,13 @@ onBeforeUnmount(() => {
             show-size-picker />
           <n-tooltip>
             <template #trigger>
-              <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading }]">
+              <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading, 'is-manual': manualRefreshSpin }]">
                 <AutorenewRound />
               </n-icon>
             </template>
             {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
           </n-tooltip>
-          <n-button @click="backFirstPageAndRefresh" type="primary" tertiary>
+          <n-button @click="triggerManualRefresh" type="primary" tertiary>
             {{ t('refresh') }}
           </n-button>
           <n-input v-if="showFilterInput" v-model:value="localFilterKeyword"
@@ -589,13 +598,13 @@ onBeforeUnmount(() => {
         <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" simple size="small" />
         <n-tooltip>
           <template #trigger>
-            <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading }]">
+            <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading, 'is-manual': manualRefreshSpin }]">
               <AutorenewRound />
             </n-icon>
           </template>
           {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
         </n-tooltip>
-        <n-button @click="backFirstPageAndRefresh" tertiary size="small" type="primary">
+        <n-button @click="triggerManualRefresh" tertiary size="small" type="primary">
           {{ t('refresh') }}
         </n-button>
       </n-space>
@@ -706,6 +715,10 @@ onBeforeUnmount(() => {
 
 .auto-refresh-spinner.is-active {
   animation: spin 1.2s linear infinite;
+}
+
+.auto-refresh-spinner.is-manual {
+  animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
