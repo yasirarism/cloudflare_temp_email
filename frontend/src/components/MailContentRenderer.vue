@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from 'vue-i18n'
 import { CloudDownloadRound, ReplyFilled, ForwardFilled, FullscreenRound } from '@vicons/material'
 import ShadowHtmlComponent from "./ShadowHtmlComponent.vue";
@@ -24,6 +24,9 @@ const { t } = useI18n({
       saveToS3: 'Save to S3',
       size: 'Size',
       fullscreen: 'Fullscreen',
+      otpTitle: 'OTP Codes',
+      otpCopy: 'Copy',
+      otpCopied: 'OTP copied',
     },
     zh: {
       delete: '删除',
@@ -37,6 +40,9 @@ const { t } = useI18n({
       saveToS3: '保存到S3',
       size: '大小',
       fullscreen: '全屏',
+      otpTitle: '验证码',
+      otpCopy: '复制',
+      otpCopied: '验证码已复制',
     }
   }
 });
@@ -86,6 +92,24 @@ const showAttachments = ref(false);
 const curAttachments = ref([]);
 const attachmentLoding = ref(false);
 const showFullscreen = ref(false);
+const message = useMessage();
+
+const otpCodes = computed(() => {
+  const subject = props.mail?.subject || '';
+  const text = props.mail?.text || '';
+  const source = `${subject}\n${text}`;
+  const matches = source.match(/\b\d{4,8}\b/g) || [];
+  return Array.from(new Set(matches)).slice(0, 5);
+});
+
+const copyOtp = async (code) => {
+  try {
+    await navigator.clipboard.writeText(code);
+    message.success(t('otpCopied'));
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const handleDelete = () => {
   props.onDelete();
@@ -183,6 +207,18 @@ const handleSaveToS3 = async (filename, blob) => {
     <!-- AI 提取信息 -->
     <AiExtractInfo :metadata="mail.metadata" />
 
+    <n-card v-if="otpCodes.length" class="otp-card" :bordered="false" embedded>
+      <n-space align="center" size="small">
+        <n-tag type="success">{{ t('otpTitle') }}</n-tag>
+        <n-space size="small">
+          <n-tag v-for="code in otpCodes" :key="code" type="success" round>{{ code }}</n-tag>
+        </n-space>
+        <n-button size="small" tertiary type="success" @click="copyOtp(otpCodes[0])">
+          {{ t('otpCopy') }}
+        </n-button>
+      </n-space>
+    </n-card>
+
     <!-- 邮件内容 -->
     <div class="mail-content">
       <pre v-if="showTextMail" class="mail-text">{{ mail.text }}</pre>
@@ -247,6 +283,11 @@ const handleSaveToS3 = async (filename, blob) => {
 .mail-content {
   margin-top: 10px;
   flex: 1;
+}
+
+.otp-card {
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
 }
 
 .mail-text {

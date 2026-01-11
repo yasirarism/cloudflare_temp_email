@@ -63,6 +63,9 @@ const { locale, t } = useI18n({
             menu: 'Menu',
             user: 'User',
             ok: 'OK',
+            greetingMorning: 'Good morning',
+            greetingAfternoon: 'Good afternoon',
+            greetingEvening: 'Good evening',
         },
         id: {
             title: 'Cloudflare Email Sementara',
@@ -74,6 +77,9 @@ const { locale, t } = useI18n({
             menu: 'Menu',
             user: 'Pengguna',
             ok: 'OK',
+            greetingMorning: 'Selamat pagi',
+            greetingAfternoon: 'Selamat siang',
+            greetingEvening: 'Selamat malam',
         }
     }
 });
@@ -234,6 +240,24 @@ onMounted(async () => {
     await api.getOpenSettings(message, notification);
     // make sure user_id is fetched
     if (!userSettings.value.user_id) await api.getUserSettings(message);
+    const hour = new Date().getHours();
+    const greeting =
+        hour >= 5 && hour < 12
+            ? t('greetingMorning')
+            : hour >= 12 && hour < 18
+                ? t('greetingAfternoon')
+                : t('greetingEvening');
+    const emailKey = userSettings.value.user_email || 'guest';
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const greetingKey = `greeting-${emailKey}-${todayKey}`;
+    if (!localStorage.getItem(greetingKey)) {
+        notification.success({
+            title: greeting,
+            content: openSettings.value.title || t('title'),
+            duration: 4000
+        });
+        localStorage.setItem(greetingKey, 'shown');
+    }
 });
 </script>
 

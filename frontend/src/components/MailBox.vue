@@ -321,7 +321,12 @@ const clickRow = async (row) => {
     row.checked = !row.checked;
     return;
   }
-  curMail.value = row;
+  if (curMail.value?.id === row.id) {
+    return;
+  }
+  requestAnimationFrame(() => {
+    curMail.value = row;
+  });
 };
 
 
