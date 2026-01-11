@@ -31,8 +31,6 @@ jobs:
           run_install: false
 
       - name: Deploy Backend for ${{ github.ref_name }}
-        env:
-          BACKEND_TOML: ${{ secrets.BACKEND_TOML }}
         run: |
           export use_worker_assets=${{ secrets.USE_WORKER_ASSETS }}
           export use_worker_assets_with_telegram=${{ secrets.USE_WORKER_ASSETS_WITH_TELEGRAM }}
@@ -76,3 +74,4 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          BACKEND_TOML: ${{ secrets.BACKEND_TOML }}
