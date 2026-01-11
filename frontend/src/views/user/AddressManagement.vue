@@ -22,7 +22,7 @@ const { locale, t } = useI18n({
             mail_count: 'Mail Count',
             send_count: 'Send Count',
             actions: 'Actions',
-            changeMailAddress: 'Change Address',
+            openInbox: 'Open Inbox',
             unbindAddress: 'Unbind Address',
             unbindAddressTip: 'Before unbinding, please switch to this email address and save the email address credential.',
             transferAddress: 'Transfer Address',
@@ -33,6 +33,7 @@ const { locale, t } = useI18n({
             publicAccess: 'Public Access',
             publicAccessEnabled: 'Public',
             publicAccessDisabled: 'Private',
+            viewInbox: 'View Inbox',
         },
         zh: {
             success: '成功',
@@ -40,7 +41,7 @@ const { locale, t } = useI18n({
             mail_count: '邮件数量',
             send_count: '发送数量',
             actions: '操作',
-            changeMailAddress: '切换地址',
+            openInbox: '打开收件箱',
             unbindAddress: '解绑地址',
             unbindAddressTip: '解绑前请切换到此邮箱地址并保存邮箱地址凭证。',
             transferAddress: '转移地址',
@@ -51,6 +52,7 @@ const { locale, t } = useI18n({
             publicAccess: '公开访问',
             publicAccessEnabled: '公开',
             publicAccessDisabled: '私有',
+            viewInbox: '查看收件箱',
         }
     }
 });
@@ -64,7 +66,7 @@ const targetUserEmail = ref('')
 const changeMailAddress = async (address_id) => {
     try {
         const res = await api.fetch(`/user_api/bind_address_jwt/${address_id}`);
-        message.success(t('changeMailAddress') + " " + t('success'));
+        message.success(t('openInbox') + " " + t('success'));
         if (!res.jwt) {
             message.error("jwt not found");
             return;
@@ -170,6 +172,16 @@ const columns = [
         width: 90,
         align: 'center',
         render(row) {
+            if (row.mail_count > 0) {
+                return h(NButton, {
+                    text: true,
+                    class: 'inbox-button',
+                    onClick: () => changeMailAddress(row.id),
+                }, {
+                    icon: () => h('span', { class: 'count-text' }, String(row.mail_count)),
+                    default: () => t('viewInbox')
+                })
+            }
             return h('span', { class: 'count-text' }, String(row.mail_count))
         }
     },
@@ -205,9 +217,9 @@ const columns = [
                                 tertiary: true,
                                 type: "primary",
                             },
-                            { default: () => t('changeMailAddress') }
+                            { default: () => t('openInbox') }
                         ),
-                        default: () => `${t('changeMailAddress')}?`
+                        default: () => `${t('openInbox')}?`
                     }
                 ),
                 h(NButton,
@@ -294,6 +306,14 @@ onMounted(async () => {
 .action-group :deep(.n-button) {
     min-width: 0;
     border-radius: 999px;
+}
+
+.inbox-button {
+    border-radius: 999px;
+}
+
+.inbox-button :deep(.n-button__content) {
+    gap: 6px;
 }
 
 .address-cell {
