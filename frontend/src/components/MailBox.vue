@@ -641,6 +641,7 @@ onBeforeUnmount(() => {
         </n-list>
       </div>
       <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
+        :duration="120"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">

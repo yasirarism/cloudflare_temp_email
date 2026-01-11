@@ -191,6 +191,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 260,
         render(row) {
             return h('div', { class: 'action-group' }, [
                 h(NSwitch, {
