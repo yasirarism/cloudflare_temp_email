@@ -122,6 +122,8 @@ onMounted(async () => {
   --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
   --glass-selection-bg: rgba(255, 255, 255, 0.25);
   --glass-backdrop-blur: 18px;
+  --glass-button-bg: rgba(255, 255, 255, 0.35);
+  --glass-button-border: rgba(255, 255, 255, 0.55);
   --app-bg-start: #e0f2fe;
   --app-bg-end: #f1f5f9;
 }
@@ -131,11 +133,14 @@ onMounted(async () => {
   --glass-border: rgba(148, 163, 184, 0.25);
   --glass-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
   --glass-selection-bg: rgba(30, 41, 59, 0.55);
+  --glass-button-bg: rgba(30, 41, 59, 0.7);
+  --glass-button-border: rgba(148, 163, 184, 0.25);
   --app-bg-start: #0f172a;
   --app-bg-end: #111827;
 }
 
 body {
+  margin: 0;
   background: radial-gradient(circle at top, var(--app-bg-start), transparent 55%),
     radial-gradient(circle at bottom, rgba(125, 211, 252, 0.45), transparent 60%),
     linear-gradient(135deg, var(--app-bg-start), var(--app-bg-end));
@@ -143,17 +148,34 @@ body {
 }
 
 .glass-shell {
-  padding: 16px;
+  padding: 0;
 }
 
 .glass-surface,
 .glass-shell .n-card,
 .glass-shell .n-tabs-nav,
 .glass-shell .n-list,
+.glass-shell .n-split,
+.glass-shell .n-split-pane,
 .glass-shell .n-drawer-content,
-.glass-shell .n-modal {
+.glass-shell .n-modal,
+.glass-shell .n-dropdown-menu,
+.glass-shell .n-select-menu,
+.glass-shell .n-popover,
+.glass-shell .n-popconfirm,
+.glass-shell .n-message,
+.glass-shell .n-notification,
+.glass-shell .n-dialog {
   background: var(--glass-bg) !important;
   border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+}
+
+.glass-shell .n-button {
+  background: var(--glass-button-bg) !important;
+  border: 1px solid var(--glass-button-border) !important;
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
@@ -173,6 +195,7 @@ body {
 .main {
   height: 100vh;
   text-align: center;
+  padding: 0;
 }
 
 .n-grid {

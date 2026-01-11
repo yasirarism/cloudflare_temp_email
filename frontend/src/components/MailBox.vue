@@ -508,7 +508,7 @@ onBeforeUnmount(() => {
         :on-update:size="onSpiltSizeChange">
         <template #1>
           <div style="overflow: auto; min-height: 50vh; max-height: 100vh;">
-            <n-list hoverable clickable>
+            <n-list hoverable clickable class="glass-panel">
               <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
                 :class="mailItemClass(row)">
                 <template #prefix v-if="multiActionMode">
@@ -560,13 +560,13 @@ onBeforeUnmount(() => {
               </n-button>
             </n-flex>
           </div>
-          <n-card :bordered="false" embedded v-if="curMail" class="mail-item" :title="curMail.subject"
+          <n-card :bordered="false" embedded v-if="curMail" class="mail-item glass-panel" :title="curMail.subject"
             style="overflow: auto; max-height: 100vh;">
             <MailContentRenderer :mail="curMail" :showEMailTo="showEMailTo"
               :enableUserDeleteEmail="enableUserDeleteEmail" :showReply="showReply" :showSaveS3="showSaveS3"
               :onDelete="deleteMail" :onReply="replyMail" :onForward="forwardMail" :onSaveToS3="saveToS3Proxy" />
           </n-card>
-          <n-card :bordered="false" embedded class="mail-item" v-else>
+          <n-card :bordered="false" embedded class="mail-item glass-panel" v-else>
             <n-result status="info" :title="t('pleaseSelectMail')">
             </n-result>
           </n-card>
@@ -593,7 +593,7 @@ onBeforeUnmount(() => {
           :placeholder="t('keywordQueryTip')" size="small" clearable />
       </div>
       <div style="overflow: auto; height: 80vh;">
-        <n-list hoverable clickable>
+        <n-list hoverable clickable class="glass-panel">
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
             <n-thing :title="row.subject">
               <template #description>
@@ -622,7 +622,7 @@ onBeforeUnmount(() => {
       <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
-          <n-card :bordered="false" embedded style="overflow: auto;">
+          <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">
             <MailContentRenderer :mail="curMail" :showEMailTo="showEMailTo"
               :enableUserDeleteEmail="enableUserDeleteEmail" :showReply="showReply" :showSaveS3="showSaveS3"
               :useUTCDate="useUTCDate" :onDelete="deleteMail" :onReply="replyMail" :onForward="forwardMail"
@@ -675,6 +675,14 @@ onBeforeUnmount(() => {
 
 .overlay-light-backgroud {
   background-color: var(--glass-selection-bg);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
 
 .mail-item {
