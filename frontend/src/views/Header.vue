@@ -284,8 +284,8 @@ onMounted(async () => {
 }
 
 .n-page-header {
-    padding-top: 28px;
-    padding-bottom: 12px;
+    padding-top: 36px;
+    padding-bottom: 16px;
 }
 
 .n-page-header :deep(.n-page-header__avatar),
