@@ -76,7 +76,7 @@ const getUrlWithJwt = () => {
 
 const getPublicUrl = computed(() => {
     if (!settings.value.address) return '';
-    return `${window.location.origin}/${locale.value}/?address=${encodeURIComponent(settings.value.address)}`
+    return `${window.location.origin}/${locale.value}/?email=${encodeURIComponent(settings.value.address)}`
 })
 
 const getAccessUrl = computed(() => {

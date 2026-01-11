@@ -60,9 +60,9 @@ router.beforeEach(async (to, from, next) => {
         jwt.value = to.query.jwt;
         publicAccessError.value = '';
     }
-    const queryAddress = typeof to.query.address === 'string' ? to.query.address : '';
+    const queryEmail = typeof to.query.email === 'string' ? to.query.email : '';
     const paramAddress = typeof to.params.address === 'string' ? to.params.address : '';
-    const address = queryAddress || paramAddress;
+    const address = queryEmail || paramAddress;
     if (!to.query.jwt && address && address.includes('@')) {
         try {
             const { jwt: publicJwt } = await api.getPublicAddressJwt(address);

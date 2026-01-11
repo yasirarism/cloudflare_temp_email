@@ -235,8 +235,8 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="app-header">
-        <n-page-header class="app-header-card">
+    <div>
+        <n-page-header>
             <template #title>
                 <h3>{{ openSettings.title || t('title') }}</h3>
             </template>
@@ -280,42 +280,6 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.app-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.app-header-card {
-    background: rgba(15, 23, 42, 0.4);
-    border: none;
-    box-shadow: none;
-}
-
-.app-header :deep(.n-page-header__main) {
-    padding: 10px 8px;
-}
-
-.app-header :deep(.n-page-header__title h3) {
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: 0.02em;
-}
-
-.app-header :deep(.n-page-header__avatar) {
-    border-radius: 12px;
-    padding: 4px;
-    background: rgba(59, 130, 246, 0.25);
-}
-
-.app-header :deep(.n-menu-item-content) {
-    border-radius: 9999px;
-    padding: 0 12px;
 }
 
 .n-alert {
