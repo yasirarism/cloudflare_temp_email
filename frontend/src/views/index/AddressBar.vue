@@ -37,8 +37,8 @@ const { locale, t } = useI18n({
             publicAccessDisabled: 'Public access is disabled for this address.',
             privateAccess: 'Private (JWT)',
             publicAccessLabel: 'Public (Address)',
-            publicAccessToggle: 'Public access',
-            success: 'Success',
+            manageUserAddresses: 'User Addresses',
+            manageLocalAddresses: 'Local Addresses',
         },
         zh: {
             ok: '确定',
@@ -53,15 +53,14 @@ const { locale, t } = useI18n({
             publicAccessDisabled: '该地址未启用公开访问。',
             privateAccess: '私有 (JWT)',
             publicAccessLabel: '公开 (地址)',
-            publicAccessToggle: '公开访问',
-            success: '成功',
+            manageUserAddresses: '用户地址',
+            manageLocalAddresses: '本地地址',
         }
     }
 });
 
 const showAddressManage = ref(false)
 const accessMode = ref('private')
-const visibilityUpdating = ref(false)
 
 const getUrlWithJwt = () => {
     return `${window.location.origin}/?jwt=${jwt.value}`
@@ -79,23 +78,6 @@ const getAccessUrl = computed(() => {
     return getUrlWithJwt();
 })
 
-const togglePublicAccess = async (enabled) => {
-    try {
-        visibilityUpdating.value = true;
-        await api.fetch(`/api/address_visibility`, {
-            method: 'POST',
-            body: JSON.stringify({
-                public_access: enabled,
-            })
-        });
-        settings.value.public_access = enabled;
-        message.success(t('success'));
-    } catch (error) {
-        message.error(error.message || "error");
-    } finally {
-        visibilityUpdating.value = false;
-    }
-}
 
 const onUserLogin = async () => {
     await router.push(getRouterPathWithLang("/user", locale.value))
@@ -180,14 +162,16 @@ onMounted(async () => {
             </n-card>
         </n-modal>
         <n-modal v-model:show="showAddressManage" preset="card" :title="t('addressManage')"
-            :style="{ width: isMobile ? '92vw' : '720px', maxWidth: '720px' }">
-            <n-form-item-row v-if="settings.address" :label="t('publicAccessToggle')">
-                <n-switch :value="settings.public_access" :loading="visibilityUpdating" :round="false"
-                    @update:value="togglePublicAccess" />
-            </n-form-item-row>
+            :style="{ width: isMobile ? '95vw' : '900px', maxWidth: '95vw' }">
             <TelegramAddress v-if="isTelegram" />
-            <AddressManagement v-else-if="userJwt" />
-            <LocalAddress v-else />
+            <n-tabs v-else type="segment">
+                <n-tab-pane v-if="userJwt" name="user" :tab="t('manageUserAddresses')">
+                    <AddressManagement />
+                </n-tab-pane>
+                <n-tab-pane name="local" :tab="t('manageLocalAddresses')">
+                    <LocalAddress />
+                </n-tab-pane>
+            </n-tabs>
         </n-modal>
     </div>
 </template>
