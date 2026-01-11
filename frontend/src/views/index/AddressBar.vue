@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { User, ExchangeAlt } from '@vicons/fa'
@@ -19,7 +19,7 @@ const isMobile = useIsMobile()
 
 const {
     jwt, settings, showAddressCredential, userJwt,
-    isTelegram, addressPassword
+    isTelegram, addressPassword, publicAccessError
 } = useGlobalState()
 
 const { locale, t } = useI18n({
@@ -39,6 +39,9 @@ const { locale, t } = useI18n({
             publicAccessLabel: 'Public (Address)',
             manageUserAddresses: 'User Addresses',
             manageLocalAddresses: 'Local Addresses',
+            publicAccessPrivate: 'This address is private. Please use the JWT access link.',
+            publicAccessNotFound: 'Address not found.',
+            publicAccessFailed: 'Failed to access public address.',
         },
         zh: {
             ok: '确定',
@@ -55,6 +58,9 @@ const { locale, t } = useI18n({
             publicAccessLabel: '公开 (地址)',
             manageUserAddresses: '用户地址',
             manageLocalAddresses: '本地地址',
+            publicAccessPrivate: '该地址为私有，请使用 JWT 访问链接。',
+            publicAccessNotFound: '未找到该地址。',
+            publicAccessFailed: '公开地址访问失败。',
         }
     }
 });
@@ -68,7 +74,7 @@ const getUrlWithJwt = () => {
 
 const getPublicUrl = computed(() => {
     if (!settings.value.address) return '';
-    return `${window.location.origin}/${locale.value}/${settings.value.address}`
+    return `${window.location.origin}/${locale.value}/?address=${encodeURIComponent(settings.value.address)}`
 })
 
 const getAccessUrl = computed(() => {
@@ -86,10 +92,21 @@ const onUserLogin = async () => {
 onMounted(async () => {
     await api.getSettings();
 });
+
+watch(jwt, (value) => {
+    if (value) {
+        publicAccessError.value = '';
+    }
+});
 </script>
 
 <template>
     <div>
+        <n-alert v-if="publicAccessError" type="warning" :show-icon="false" :bordered="false">
+            <span v-if="publicAccessError === 'private'">{{ t('publicAccessPrivate') }}</span>
+            <span v-else-if="publicAccessError === 'notFound'">{{ t('publicAccessNotFound') }}</span>
+            <span v-else>{{ t('publicAccessFailed') }}</span>
+        </n-alert>
         <n-card :bordered="false" embedded v-if="!settings.fetched">
             <n-skeleton style="height: 50vh" />
         </n-card>

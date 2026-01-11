@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, h, computed } from 'vue';
+import { ref, h, computed, watch } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { useI18n } from 'vue-i18n'
-import { NPopconfirm, NButton } from 'naive-ui'
+import { NPopconfirm, NButton, NSwitch } from 'naive-ui'
 
 // @ts-ignore
 import { useGlobalState } from '../../store'
+import { api } from '../../api'
 // @ts-ignore
 import Login from '../common/Login.vue';
 
-const { jwt } = useGlobalState()
+const { jwt, settings } = useGlobalState()
 // @ts-ignore
 const message = useMessage()
 
@@ -24,6 +25,9 @@ const { t } = useI18n({
             unbindMailAddress: 'Unbind Mail Address credential',
             create_or_bind: 'Create or Bind',
             bindAddressSuccess: 'Bind Address Success',
+            publicAccess: 'Public Access',
+            publicAccessEnabled: 'Public',
+            publicAccessDisabled: 'Private',
         },
         zh: {
             tip: '这些地址存储在您的浏览器中，如果您清除浏览器缓存，可能会丢失。',
@@ -34,12 +38,17 @@ const { t } = useI18n({
             unbindMailAddress: '解绑邮箱地址',
             create_or_bind: '创建或绑定',
             bindAddressSuccess: '绑定地址成功',
+            publicAccess: '公开访问',
+            publicAccessEnabled: '公开',
+            publicAccessDisabled: '私有',
         }
     }
 });
 
 const tabValue = ref('address')
 const localAddressCache = useLocalStorage("LocalAddressCache", []);
+const publicAccessMap = ref({});
+const publicAccessLoading = ref({});
 const data = computed(() => {
     // @ts-ignore
     if (!localAddressCache.value.includes(jwt.value)) {
@@ -71,6 +80,45 @@ const data = computed(() => {
 
 })
 
+const fetchPublicAccess = async (row: { jwt: string; valid: boolean }) => {
+    if (!row?.valid || !row.jwt) return;
+    if (publicAccessMap.value[row.jwt] !== undefined) return;
+    if (publicAccessLoading.value[row.jwt]) return;
+    publicAccessLoading.value[row.jwt] = true;
+    try {
+        const res = await api.fetch("/api/settings", { jwt: row.jwt, loading: false });
+        publicAccessMap.value[row.jwt] = !!res?.public_access;
+    } catch (error) {
+        publicAccessMap.value[row.jwt] = null;
+    } finally {
+        publicAccessLoading.value[row.jwt] = false;
+    }
+};
+
+watch(data, (rows) => {
+    rows.forEach((row) => fetchPublicAccess(row));
+}, { immediate: true });
+
+const updatePublicAccess = async (row: { jwt: string; valid: boolean }, enabled: boolean) => {
+    if (!row?.valid || !row.jwt) return;
+    try {
+        await api.fetch(`/api/address_visibility`, {
+            method: 'POST',
+            body: JSON.stringify({
+                public_access: enabled,
+            }),
+            jwt: row.jwt,
+        });
+        publicAccessMap.value[row.jwt] = enabled;
+        if (row.jwt === jwt.value) {
+            settings.value.public_access = enabled;
+        }
+        message.success(t('success'));
+    } catch (error) {
+        message.error((error as Error).message || "error");
+    }
+};
+
 const bindAddress = async () => {
     try {
         // @ts-ignore
@@ -89,6 +137,22 @@ const columns = [
     {
         title: t('address'),
         key: "address"
+    },
+    {
+        title: t('publicAccess'),
+        key: "public_access",
+        render(row: any) {
+            const accessValue = publicAccessMap.value[row.jwt];
+            return h(NSwitch, {
+                value: !!accessValue,
+                disabled: !row.valid || accessValue === null,
+                loading: !!publicAccessLoading.value[row.jwt],
+                'onUpdate:value': (value: boolean) => updatePublicAccess(row, value),
+            }, {
+                checked: () => t('publicAccessEnabled'),
+                unchecked: () => t('publicAccessDisabled'),
+            })
+        }
     },
     {
         title: t('actions'),

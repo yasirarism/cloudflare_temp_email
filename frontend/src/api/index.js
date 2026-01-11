@@ -19,7 +19,10 @@ const instance = axios.create({
 });
 
 const apiFetch = async (path, options = {}) => {
-    loading.value = true;
+    const shouldToggleLoading = options.loading !== false;
+    if (shouldToggleLoading) {
+        loading.value = true;
+    }
     try {
         // Get browser fingerprint for request tracking
         const fingerprint = await getFingerprint();
@@ -34,7 +37,7 @@ const apiFetch = async (path, options = {}) => {
                 'x-custom-auth': auth.value,
                 'x-admin-auth': adminAuth.value,
                 'x-fingerprint': fingerprint,
-                'Authorization': `Bearer ${jwt.value}`,
+                'Authorization': `Bearer ${options.jwt || jwt.value}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -55,7 +58,9 @@ const apiFetch = async (path, options = {}) => {
         }
         throw error;
     } finally {
-        loading.value = false;
+        if (shouldToggleLoading) {
+            loading.value = false;
+        }
     }
 }
 

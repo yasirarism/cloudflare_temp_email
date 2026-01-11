@@ -62,6 +62,7 @@ export const useGlobalState = createGlobalState(
         const showAuth = ref(false);
         const showAddressCredential = ref(false);
         const showAdminAuth = ref(false);
+        const publicAccessError = ref('');
         const auth = useStorage('auth', '');
         const adminAuth = useStorage('adminAuth', '');
         const jwt = useStorage('jwt', '');
@@ -123,6 +124,7 @@ export const useGlobalState = createGlobalState(
             openSettings,
             showAuth,
             showAddressCredential,
+            publicAccessError,
             auth,
             jwt,
             adminAuth,
