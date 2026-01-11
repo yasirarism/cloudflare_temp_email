@@ -337,7 +337,7 @@ onMounted(async () => {
     padding: 2px 10px;
 }
 
-.nav-button {
+:deep(.nav-button) {
     border-radius: 999px;
 }
 
