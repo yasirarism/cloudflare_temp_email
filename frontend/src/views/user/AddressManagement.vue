@@ -156,6 +156,10 @@ const columns = [
     {
         title: t('name'),
         key: "name",
+        width: 280,
+        ellipsis: {
+            tooltip: true
+        },
         render(row) {
             return h('span', { class: 'address-cell' }, row.name)
         }
@@ -293,7 +297,7 @@ onMounted(async () => {
 
 .address-cell {
     display: inline-block;
-    max-width: 220px;
+    max-width: 320px;
     width: 100%;
     white-space: normal;
     word-break: break-word;
@@ -319,7 +323,7 @@ onMounted(async () => {
     }
 
     .address-cell {
-        max-width: 160px;
+        max-width: 220px;
     }
 }
 </style>

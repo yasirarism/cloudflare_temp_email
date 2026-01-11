@@ -284,7 +284,8 @@ onMounted(async () => {
 }
 
 .n-page-header {
-    padding-top: 12px;
+    padding-top: 18px;
+    padding-bottom: 8px;
 }
 
 .menu-toggle {
