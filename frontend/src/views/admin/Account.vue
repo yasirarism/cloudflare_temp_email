@@ -328,23 +328,28 @@ const columns = [
     },
     {
         title: "ID",
-        key: "id"
+        key: "id",
+        width: 100
     },
     {
         title: t('name'),
-        key: "name"
+        key: "name",
+        width: 200
     },
     {
         title: t('created_at'),
-        key: "created_at"
+        key: "created_at",
+        width: 180
     },
     {
         title: t('updated_at'),
-        key: "updated_at"
+        key: "updated_at",
+        width: 180
     },
     {
         title: t('source_meta'),
-        key: "source_meta"
+        key: "source_meta",
+        width: 200
     },
     {
         title: t('mail_count'),
@@ -405,7 +410,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
-        width: 260,
+        width: 220,
         render(row) {
             return h('div', [
                 h(NMenu, {
@@ -645,7 +650,16 @@ onMounted(async () => {
 }
 
 .count-text {
+    background: #22c55e;
+    border-radius: 999px;
+    color: #fff;
+    display: inline-flex;
     font-weight: 600;
+    min-width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
 }
 
 .n-switch :deep(.n-switch__checked),

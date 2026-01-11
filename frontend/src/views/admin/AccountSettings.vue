@@ -296,7 +296,7 @@ onMounted(async () => {
                 <span>{{ t("tip") }}</span>
             </n-alert>
             <n-flex justify="end">
-                <n-button @click="save" type="primary" :loading="loading">
+                <n-button @click="save" type="primary" :loading="loading" class="admin-save">
                     {{ t('save') }}
                 </n-button>
             </n-flex>
@@ -370,9 +370,13 @@ onMounted(async () => {
             <n-space justify="end">
                 <n-button @click="addNewEmailForwardingItem">{{ t('add') }}</n-button>
             </n-space>
-            <n-data-table :columns="emailForwardingColumns" :data="emailForwardingList" :bordered="false" striped />
+            <div class="forwarding-table">
+                <n-data-table :columns="emailForwardingColumns" :data="emailForwardingList" :bordered="false" striped />
+            </div>
             <n-space justify="end">
-                <n-button @click="saveEmailForwardingConfig" type="primary">{{ t('save') }}</n-button>
+                <n-button @click="saveEmailForwardingConfig" type="primary" class="admin-save">
+                    {{ t('save') }}
+                </n-button>
             </n-space>
         </n-space>
     </n-modal>
@@ -385,5 +389,18 @@ onMounted(async () => {
     place-items: center;
     justify-content: center;
     margin: 20px;
+}
+
+.admin-save :deep(.n-button__content) {
+    color: inherit;
+}
+
+.forwarding-table {
+    overflow: auto;
+    max-width: 100%;
+}
+
+.forwarding-table :deep(.n-data-table) {
+    min-width: 720px;
 }
 </style>
