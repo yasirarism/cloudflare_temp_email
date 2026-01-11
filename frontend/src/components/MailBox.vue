@@ -648,7 +648,7 @@ onBeforeUnmount(() => {
         </n-list>
       </div>
       <n-drawer :show="drawerVisible" @update:show="handleDrawerUpdate" width="100%" placement="bottom"
-        :trap-focus="false" :block-scroll="false" :duration="120"
+        class="mail-drawer" :trap-focus="false" :block-scroll="false" :duration="160"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">
@@ -730,6 +730,11 @@ onBeforeUnmount(() => {
 .glass-input :deep(.n-input__placeholder),
 .glass-input :deep(.n-input__suffix) {
   color: inherit;
+}
+
+.mail-drawer :deep(.n-drawer-content) {
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .mail-item {

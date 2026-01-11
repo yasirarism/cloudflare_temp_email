@@ -1,7 +1,7 @@
 <script setup>
 import { ref, h, onMounted, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n'
-import { NMenu, NButton, NBadge, NTag } from 'naive-ui';
+import { NMenu, NButton, NTag } from 'naive-ui';
 import { MenuFilled } from '@vicons/material'
 
 import { useGlobalState } from '../../store'
@@ -220,6 +220,7 @@ const columns = [
         title: t('address_count'),
         key: "address_count",
         render(row) {
+            const displayCount = row.address_count > 99 ? '99' : String(row.address_count)
             return h(NButton,
                 {
                     text: true,
@@ -230,12 +231,7 @@ const columns = [
                     }
                 },
                 {
-                    icon: () => h(NBadge, {
-                        value: row.address_count,
-                        'show-zero': true,
-                        max: 99,
-                        type: "success"
-                    }),
+                    icon: () => h('span', { class: 'count-text' }, displayCount),
                     default: () => row.address_count > 0 ? t('userAddressManagement') : ""
                 }
             )
@@ -431,6 +427,21 @@ onMounted(async () => {
 
 .n-data-table {
     min-width: 800px;
+}
+
+.count-text {
+    align-items: center;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+    color: #fff;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    height: 28px;
+    justify-content: center;
+    min-width: 28px;
+    width: 28px;
 }
 
 @media (max-width: 720px) {

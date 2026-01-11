@@ -654,11 +654,14 @@ onMounted(async () => {
 .count-text {
     background: #22c55e;
     border-radius: 50%;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
     color: #fff;
     display: inline-flex;
+    font-size: 12px;
     font-weight: 600;
-    min-width: 24px;
-    height: 24px;
+    min-width: 28px;
+    height: 28px;
+    width: 28px;
     align-items: center;
     justify-content: center;
     padding: 0;

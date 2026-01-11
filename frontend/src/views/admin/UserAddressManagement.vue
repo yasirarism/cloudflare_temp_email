@@ -85,12 +85,15 @@ onMounted(async () => {
     align-items: center;
     background: #22c55e;
     border-radius: 50%;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
     color: #fff;
     display: inline-flex;
+    font-size: 12px;
     font-weight: 600;
-    height: 24px;
+    height: 28px;
     justify-content: center;
-    min-width: 24px;
+    min-width: 28px;
+    width: 28px;
     padding: 0;
 }
 </style>
