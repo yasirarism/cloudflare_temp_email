@@ -197,7 +197,10 @@ body,
 .glass-theme .n-menu-item-content,
 .glass-theme .n-dropdown-option,
 .glass-theme .n-select-option,
-.glass-theme .n-base-selection-label {
+.glass-theme .n-base-selection-label,
+.glass-theme .n-menu-item-content__icon,
+.glass-theme .n-dropdown-option-body__label,
+.glass-theme .n-select-option-body__label {
   background: transparent;
   color: inherit;
 }

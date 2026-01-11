@@ -4,6 +4,7 @@ import User from '../views/User.vue'
 import UserOauth2Callback from '../views/user/UserOauth2Callback.vue'
 import i18n from '../i18n'
 import { useGlobalState } from '../store'
+import { api } from '../api'
 
 const { jwt } = useGlobalState()
 
@@ -31,6 +32,10 @@ const router = createRouter({
             component: () => import('../views/Admin.vue')
         },
         {
+            path: '/:lang/:address',
+            component: Index
+        },
+        {
             path: '/telegram_mail',
             alias: "/:lang/telegram_mail",
             component: () => import('../views/telegram/Mail.vue')
@@ -44,7 +49,7 @@ const router = createRouter({
 });
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     if (to.params.lang && ['en', 'zh'].includes(to.params.lang)) {
         i18n.global.locale.value = to.params.lang
     } else {
@@ -53,6 +58,16 @@ router.beforeEach((to, from, next) => {
     // check if query parameter has jwt, set it to store
     if (to.query.jwt) {
         jwt.value = to.query.jwt;
+    }
+    if (!to.query.jwt && typeof to.params.address === 'string' && to.params.address.includes('@')) {
+        try {
+            const { jwt: publicJwt } = await api.getPublicAddressJwt(to.params.address);
+            if (publicJwt) {
+                jwt.value = publicJwt;
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
     next()
 });

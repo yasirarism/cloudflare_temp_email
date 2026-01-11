@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { User, ExchangeAlt } from '@vicons/fa'
@@ -48,10 +48,23 @@ const { locale, t } = useI18n({
 });
 
 const showAddressManage = ref(false)
+const accessMode = ref('private')
 
 const getUrlWithJwt = () => {
     return `${window.location.origin}/?jwt=${jwt.value}`
 }
+
+const getPublicUrl = computed(() => {
+    if (!settings.value.address) return '';
+    return `${window.location.origin}/${locale.value}/${settings.value.address}`
+})
+
+const getAccessUrl = computed(() => {
+    if (accessMode.value === 'public') {
+        return getPublicUrl.value;
+    }
+    return getUrlWithJwt();
+})
 
 const onUserLogin = async () => {
     await router.push(getRouterPathWithLang("/user", locale.value))
@@ -107,6 +120,10 @@ onMounted(async () => {
             <span>
                 <p>{{ t("addressCredentialTip") }}</p>
             </span>
+            <n-radio-group v-model:value="accessMode" size="small" style="margin-bottom: 12px;">
+                <n-radio value="private">Private (JWT)</n-radio>
+                <n-radio value="public">Public (Address)</n-radio>
+            </n-radio-group>
             <n-card embedded>
                 <b>{{ jwt }}</b>
             </n-card>
@@ -118,7 +135,7 @@ onMounted(async () => {
                 <n-collapse>
                     <n-collapse-item :title='t("linkWithAddressCredential")'>
                         <n-card embedded>
-                            <b>{{ getUrlWithJwt() }}</b>
+                            <b>{{ getAccessUrl }}</b>
                         </n-card>
                     </n-collapse-item>
                 </n-collapse>

@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { Jwt } from 'hono/utils/jwt';
 
 import utils from './utils';
 import { CONSTANTS } from './constants';
@@ -43,6 +44,34 @@ api.get('/open_api/settings', async (c) => {
         "disableAdminPasswordCheck": utils.getBooleanValue(c.env.DISABLE_ADMIN_PASSWORD_CHECK),
         "enableAddressPassword": utils.getBooleanValue(c.env.ENABLE_ADDRESS_PASSWORD)
     });
+})
+
+api.get('/open_api/address_jwt', async (c) => {
+    const address = c.req.query('address')?.trim();
+    if (!address) {
+        return c.json({ error: "address is required" }, 400);
+    }
+
+    const passwords = utils.getPasswords(c);
+    if (passwords && passwords.length > 0) {
+        const auth = c.req.raw.headers.get("x-custom-auth");
+        if (!auth || !passwords.includes(auth)) {
+            return c.text("Unauthorized", 401);
+        }
+    }
+
+    const normalizedAddress = address.toLowerCase();
+    const addressId = await c.env.DB.prepare(
+        `SELECT id FROM address where name = ? `
+    ).bind(normalizedAddress).first("id");
+    if (!addressId) {
+        return c.text("Invalid address", 404);
+    }
+    const jwt = await Jwt.sign({
+        address: normalizedAddress,
+        address_id: addressId
+    }, c.env.JWT_SECRET, "HS256");
+    return c.json({ jwt });
 })
 
 export { api }

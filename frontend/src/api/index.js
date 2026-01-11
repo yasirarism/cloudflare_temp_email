@@ -59,6 +59,31 @@ const apiFetch = async (path, options = {}) => {
     }
 }
 
+const openApiFetch = async (path, options = {}) => {
+    try {
+        const fingerprint = await getFingerprint();
+        const response = await instance.request(path, {
+            method: options.method || 'GET',
+            data: options.body || null,
+            headers: {
+                'x-lang': i18n.global.locale.value,
+                'x-custom-auth': auth.value,
+                'x-fingerprint': fingerprint,
+                'Content-Type': 'application/json',
+            },
+        });
+        if (response.status >= 300) {
+            throw new Error(`[${response.status}]: ${response.data}` || "error");
+        }
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw new Error(`Code ${error.response.status}: ${error.response.data}` || "error");
+        }
+        throw error;
+    }
+}
+
 const getOpenSettings = async (message, notification) => {
     try {
         const res = await api.fetch("/open_api/settings");
@@ -200,6 +225,10 @@ const bindUserAddress = async () => {
     }
 }
 
+const getPublicAddressJwt = async (address) => {
+    return await openApiFetch(`/open_api/address_jwt?address=${encodeURIComponent(address)}`);
+}
+
 export const api = {
     fetch: apiFetch,
     getSettings,
@@ -209,4 +238,5 @@ export const api = {
     adminShowAddressCredential,
     adminDeleteAddress,
     bindUserAddress,
+    getPublicAddressJwt,
 }
