@@ -64,9 +64,10 @@ const props = defineProps({
 const localFilterKeyword = ref('')
 
 const {
-  isDark, mailboxSplitSize, indexTab, loading, useUTCDate,
+  isDark, mailboxSplitSize, indexTab, useUTCDate,
   autoRefresh, configAutoRefreshInterval, sendMailModel
 } = useGlobalState()
+const mailLoading = ref(false)
 const autoRefreshInterval = ref(configAutoRefreshInterval.value)
 const pageRefreshOptions = ref(null)
 const rawData = ref([])
@@ -206,7 +207,7 @@ const setupAutoRefresh = async (autoRefresh) => {
   if (autoRefresh) {
     clearInterval(timer.value);
     timer.value = setInterval(async () => {
-      if (loading.value) return;
+      if (mailLoading.value) return;
       autoRefreshInterval.value--;
       if (autoRefreshInterval.value <= 0) {
         autoRefreshInterval.value = configAutoRefreshInterval.value;
@@ -243,7 +244,7 @@ watch([page, pageSize], async ([page, pageSize], [oldPage, oldPageSize]) => {
 
 const refresh = async ({ showLoading = true, preserveSelection = true } = {}) => {
   if (showLoading) {
-    loading.value = true;
+    mailLoading.value = true;
   }
   try {
     const { results, count: totalCount } = await props.fetchMailData(
@@ -272,7 +273,7 @@ const refresh = async ({ showLoading = true, preserveSelection = true } = {}) =>
     console.error(error);
   } finally {
     if (showLoading) {
-      loading.value = false;
+      mailLoading.value = false;
     }
   }
 };
@@ -287,7 +288,7 @@ const backFirstPageAndRefresh = async ({ showLoading = true, preserveSelection =
 }
 
 const checkForNewMail = async () => {
-  if (!props.enableRealtime || autoRefresh.value || loading.value || page.value !== 1) {
+  if (!props.enableRealtime || autoRefresh.value || mailLoading.value || page.value !== 1) {
     return;
   }
   try {
@@ -330,12 +331,15 @@ const mailItemClass = (row) => {
 
 const deleteMail = async () => {
   try {
+    mailLoading.value = true;
     await props.deleteMail(curMail.value.id);
     message.success(t("success"));
     curMail.value = null;
     await refresh();
   } catch (error) {
     message.error(error.message || "error");
+  } finally {
+    mailLoading.value = false;
   }
 };
 
@@ -397,7 +401,7 @@ const multiActionSelectAll = (checked) => {
 
 const multiActionDeleteMail = async () => {
   try {
-    loading.value = true;
+    mailLoading.value = true;
     const selectedMails = data.value.filter((item) => item.checked);
     if (selectedMails.length === 0) {
       message.error(t('pleaseSelectMail'));
@@ -420,14 +424,14 @@ const multiActionDeleteMail = async () => {
   } catch (error) {
     message.error(error.message || "error");
   } finally {
-    loading.value = false;
+    mailLoading.value = false;
     showMultiActionDelete.value = true;
   }
 }
 
 const multiActionDownload = async () => {
   try {
-    loading.value = true;
+    mailLoading.value = true;
     const selectedMails = data.value.filter((item) => item.checked);
     if (selectedMails.length === 0) {
       message.error(t('pleaseSelectMail'));
@@ -447,7 +451,7 @@ const multiActionDownload = async () => {
   } catch (error) {
     message.error(error.message || "error");
   } finally {
-    loading.value = false;
+    mailLoading.value = false;
   }
 }
 
@@ -497,7 +501,7 @@ onBeforeUnmount(() => {
             show-size-picker />
           <n-tooltip>
             <template #trigger>
-              <n-icon class="auto-refresh-spinner">
+              <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading }]">
                 <AutorenewRound />
               </n-icon>
             </template>
@@ -585,7 +589,7 @@ onBeforeUnmount(() => {
         <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" simple size="small" />
         <n-tooltip>
           <template #trigger>
-            <n-icon class="auto-refresh-spinner">
+            <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading }]">
               <AutorenewRound />
             </n-icon>
           </template>
@@ -698,7 +702,10 @@ onBeforeUnmount(() => {
 
 .auto-refresh-spinner {
   font-size: 18px;
-  animation: spin 1.6s linear infinite;
+}
+
+.auto-refresh-spinner.is-active {
+  animation: spin 1.2s linear infinite;
 }
 
 @keyframes spin {

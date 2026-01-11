@@ -6,7 +6,8 @@ const fetchMailUnknowData = async (limit, offset) => {
     return await api.fetch(
         `/admin/mails_unknow`
         + `?limit=${limit}`
-        + `&offset=${offset}`
+        + `&offset=${offset}`,
+        { loading: false }
     );
 }
 

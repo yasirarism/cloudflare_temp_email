@@ -237,7 +237,9 @@ const columns = [
 .address-cell {
     display: inline-block;
     max-width: 220px;
-    word-break: break-all;
+    width: 100%;
+    white-space: normal;
+    word-break: break-word;
 }
 
 @media (max-width: 720px) {
