@@ -118,13 +118,13 @@ onMounted(async () => {
 
 <style>
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.28);
-  --glass-border: rgba(255, 255, 255, 0.45);
-  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-  --glass-selection-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  --glass-selection-bg: rgba(255, 255, 255, 0.5);
   --glass-backdrop-blur: 18px;
-  --glass-button-bg: rgba(255, 255, 255, 0.35);
-  --glass-button-border: rgba(255, 255, 255, 0.55);
+  --glass-button-bg: rgba(255, 255, 255, 0.65);
+  --glass-button-border: rgba(255, 255, 255, 0.75);
   --app-bg-start: #e0f2fe;
   --app-bg-end: #f1f5f9;
 }

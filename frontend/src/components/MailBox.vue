@@ -464,6 +464,13 @@ const triggerManualRefresh = async () => {
   }, 1200);
 }
 
+const drawerVisible = computed(() => !!curMail.value)
+const handleDrawerUpdate = (value) => {
+  if (!value) {
+    curMail.value = null
+  }
+}
+
 onMounted(async () => {
   await refresh();
   startRealtime();
@@ -640,8 +647,8 @@ onBeforeUnmount(() => {
           </n-list-item>
         </n-list>
       </div>
-      <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
-        :duration="120"
+      <n-drawer :show="drawerVisible" @update:show="handleDrawerUpdate" width="100%" placement="bottom"
+        :trap-focus="false" :block-scroll="false" :duration="80"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">

@@ -165,6 +165,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 260,
         render(row: any) {
             return h('div', { class: 'action-group' }, [
                 h(NPopconfirm,
@@ -283,6 +284,10 @@ const columns = [
 
     .address-cell {
         max-width: 200px;
+    }
+
+    .n-data-table {
+        min-width: 560px;
     }
 }
 </style>
