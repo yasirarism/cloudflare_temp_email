@@ -300,7 +300,16 @@ onMounted(async () => {
 }
 
 .count-text {
+    align-items: center;
+    background: #22c55e;
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
     font-weight: 600;
+    height: 24px;
+    justify-content: center;
+    min-width: 24px;
+    padding: 0;
 }
 
 @media (max-width: 720px) {

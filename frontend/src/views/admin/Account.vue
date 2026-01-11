@@ -653,7 +653,7 @@ onMounted(async () => {
 
 .count-text {
     background: #22c55e;
-    border-radius: 999px;
+    border-radius: 50%;
     color: #fff;
     display: inline-flex;
     font-weight: 600;
@@ -661,7 +661,7 @@ onMounted(async () => {
     height: 24px;
     align-items: center;
     justify-content: center;
-    padding: 0 8px;
+    padding: 0;
 }
 
 .n-switch :deep(.n-switch__checked),

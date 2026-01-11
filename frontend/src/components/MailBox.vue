@@ -648,7 +648,7 @@ onBeforeUnmount(() => {
         </n-list>
       </div>
       <n-drawer :show="drawerVisible" @update:show="handleDrawerUpdate" width="100%" placement="bottom"
-        :trap-focus="false" :block-scroll="false" :duration="80"
+        :trap-focus="false" :block-scroll="false" :duration="120"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">
@@ -698,6 +698,8 @@ onBeforeUnmount(() => {
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .mail-item-selected {
@@ -707,6 +709,8 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(var(--glass-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
   border-radius: 8px;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .mail-item-selected :deep(.n-list-item__content),
