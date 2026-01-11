@@ -3,7 +3,7 @@ import { watch, onMounted, ref, onBeforeUnmount, computed } from "vue";
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useGlobalState } from '../store'
-import { CloudDownloadRound, ArrowBackIosNewFilled, ArrowForwardIosFilled } from '@vicons/material'
+import { CloudDownloadRound, ArrowBackIosNewFilled, ArrowForwardIosFilled, AutorenewRound } from '@vicons/material'
 import { useIsMobile } from '../utils/composables'
 import { processItem } from '../utils/email-parser'
 import { utcToLocalDate } from '../utils';
@@ -495,14 +495,14 @@ onBeforeUnmount(() => {
           </n-button>
           <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" :page-sizes="[20, 50, 100]"
             show-size-picker />
-          <n-switch v-model:value="autoRefresh" :round="false">
-            <template #checked>
-              {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+          <n-tooltip>
+            <template #trigger>
+              <n-icon class="auto-refresh-spinner">
+                <AutorenewRound />
+              </n-icon>
             </template>
-            <template #unchecked>
-              {{ t('autoRefresh') }}
-            </template>
-          </n-switch>
+            {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+          </n-tooltip>
           <n-button @click="backFirstPageAndRefresh" type="primary" tertiary>
             {{ t('refresh') }}
           </n-button>
@@ -583,14 +583,14 @@ onBeforeUnmount(() => {
     <div class="left" v-else>
       <n-space justify="space-around" align="center" :wrap="false" style="display: flex; align-items: center;">
         <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" simple size="small" />
-        <n-switch v-model:value="autoRefresh" size="small" :round="false">
-          <template #checked>
-            {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+        <n-tooltip>
+          <template #trigger>
+            <n-icon class="auto-refresh-spinner">
+              <AutorenewRound />
+            </n-icon>
           </template>
-          <template #unchecked>
-            {{ t('autoRefresh') }}
-          </template>
-        </n-switch>
+          {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+        </n-tooltip>
         <n-button @click="backFirstPageAndRefresh" tertiary size="small" type="primary">
           {{ t('refresh') }}
         </n-button>
@@ -694,6 +694,17 @@ onBeforeUnmount(() => {
 
 .mail-item {
   height: 100%;
+}
+
+.auto-refresh-spinner {
+  font-size: 18px;
+  animation: spin 1.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 pre {

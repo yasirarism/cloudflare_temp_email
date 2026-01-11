@@ -295,5 +295,12 @@ onMounted(async () => {
         width: 100%;
         justify-content: center;
     }
+
+    .action-group :deep(.n-button__content) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 </style>

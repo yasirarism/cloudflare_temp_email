@@ -137,6 +137,10 @@ const columns = [
     {
         title: t('address'),
         key: "address"
+        ,
+        render(row: any) {
+            return h('span', { class: 'address-cell' }, row.address)
+        }
     },
     {
         title: t('publicAccess'),
@@ -230,6 +234,12 @@ const columns = [
     align-items: center;
 }
 
+.address-cell {
+    display: inline-block;
+    max-width: 220px;
+    word-break: break-all;
+}
+
 @media (max-width: 720px) {
     .action-group {
         flex-direction: column;
@@ -240,6 +250,17 @@ const columns = [
     .action-group :deep(.n-switch) {
         width: 100%;
         justify-content: center;
+    }
+
+    .action-group :deep(.n-button__content) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .address-cell {
+        max-width: 160px;
     }
 }
 </style>

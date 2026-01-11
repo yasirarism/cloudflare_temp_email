@@ -248,7 +248,8 @@ onMounted(async () => {
             <template #extra>
                 <n-space>
                     <n-menu v-if="!isMobile" mode="horizontal" :options="menuOptions" responsive />
-                    <n-button v-else :text="true" @click="showMobileMenu = !showMobileMenu" style="margin-right: 10px;">
+                    <n-button v-else :text="true" class="menu-toggle" @click="showMobileMenu = !showMobileMenu"
+                        style="margin-right: 10px;">
                         <template #icon>
                             <n-icon :component="MenuFilled" />
                         </template>
@@ -280,6 +281,17 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.menu-toggle {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    padding: 2px 10px;
+}
+
+.menu-toggle :deep(.n-button__content) {
+    color: inherit;
 }
 
 .n-alert {
