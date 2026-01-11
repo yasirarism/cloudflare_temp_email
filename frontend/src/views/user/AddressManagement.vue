@@ -299,7 +299,7 @@ onMounted(async () => {
     word-break: break-word;
 }
 
-.count-text {
+:deep(.count-text) {
     align-items: center;
     background: #22c55e;
     border-radius: 50%;

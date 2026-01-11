@@ -614,7 +614,7 @@ onMounted(async () => {
                 {{ t('selectedItems') }}: {{ selectedCount }}
             </n-tag>
         </n-space>
-        <div style="overflow: auto;">
+        <div class="admin-account-table" style="overflow: auto;">
             <div style="display: inline-block;">
                 <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count"
                     :page-sizes="[20, 50, 100]" show-size-picker>
@@ -651,7 +651,16 @@ onMounted(async () => {
     min-width: 1000px;
 }
 
-.count-text {
+.admin-account-actions :deep(.n-input),
+.admin-account-actions :deep(.n-input__input-el) {
+    border-radius: 999px;
+}
+
+.admin-account-actions :deep(.n-input) {
+    border-color: rgba(34, 197, 94, 0.6);
+}
+
+:deep(.count-text) {
     background: #22c55e;
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
@@ -673,6 +682,10 @@ onMounted(async () => {
 
 .admin-account-actions :deep(.n-button--primary) {
     box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+}
+
+.admin-account-table :deep(.n-button) {
+    border-radius: 999px;
 }
 
 .n-switch :deep(.n-switch__checked),

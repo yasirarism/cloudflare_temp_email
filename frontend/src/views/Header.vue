@@ -47,6 +47,7 @@ const stripLangPrefix = (path) => {
 
 const changeLocale = async (lang) => {
     const normalizedPath = stripLangPrefix(route.fullPath);
+    localStorage.setItem('locale', lang);
     await router.push(getRouterPathWithLang(normalizedPath, lang));
 }
 

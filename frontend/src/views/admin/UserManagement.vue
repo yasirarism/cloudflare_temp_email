@@ -429,7 +429,7 @@ onMounted(async () => {
     min-width: 800px;
 }
 
-.count-text {
+:deep(.count-text) {
     align-items: center;
     background: #22c55e;
     border-radius: 50%;
