@@ -31,6 +31,8 @@ jobs:
           run_install: false
 
       - name: Deploy Backend for ${{ github.ref_name }}
+        env:
+          BACKEND_TOML: ${{ secrets.BACKEND_TOML }}
         run: |
           export use_worker_assets=${{ secrets.USE_WORKER_ASSETS }}
           export use_worker_assets_with_telegram=${{ secrets.USE_WORKER_ASSETS_WITH_TELEGRAM }}
@@ -50,7 +52,7 @@ jobs:
           export debug_mode=${{ secrets.DEBUG_MODE }}
           export use_mail_wasm_parser=${{ secrets.BACKEND_USE_MAIL_WASM_PARSER }}
           cd worker/
-          echo '${{ secrets.BACKEND_TOML }}' > wrangler.toml
+          printf '%s' "$BACKEND_TOML" > wrangler.toml
           pnpm install --no-frozen-lockfile
 
           if [ -n "$use_mail_wasm_parser" ]; then

@@ -125,6 +125,7 @@ onMounted(async () => {
   --glass-backdrop-blur: 18px;
   --glass-button-bg: rgba(255, 255, 255, 0.65);
   --glass-button-border: rgba(255, 255, 255, 0.75);
+  --glass-text-color: #0f172a;
   --app-bg-start: #e0f2fe;
   --app-bg-end: #f1f5f9;
 }
@@ -136,6 +137,7 @@ onMounted(async () => {
   --glass-selection-bg: rgba(30, 41, 59, 0.55);
   --glass-button-bg: rgba(30, 41, 59, 0.7);
   --glass-button-border: rgba(148, 163, 184, 0.25);
+  --glass-text-color: #f8fafc;
   --app-bg-start: #0f172a;
   --app-bg-end: #111827;
 }
@@ -196,7 +198,7 @@ body,
 
 .glass-theme .n-button .n-button__content,
 .glass-theme .n-button .n-button__icon {
-  color: var(--n-text-color) !important;
+  color: var(--glass-text-color) !important;
 }
 
 .glass-theme .n-menu-item-content,
