@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { Jwt } from 'hono/utils/jwt';
 
 import utils from './utils';
 import { CONSTANTS } from './constants';
@@ -43,6 +44,52 @@ api.get('/open_api/settings', async (c) => {
         "disableAdminPasswordCheck": utils.getBooleanValue(c.env.DISABLE_ADMIN_PASSWORD_CHECK),
         "enableAddressPassword": utils.getBooleanValue(c.env.ENABLE_ADDRESS_PASSWORD)
     });
+})
+
+api.get('/open_api/address_jwt', async (c) => {
+    const address = c.req.query('address')?.trim();
+    if (!address) {
+        return c.json({ error: "address is required" }, 400);
+    }
+
+    const passwords = utils.getPasswords(c);
+    if (passwords && passwords.length > 0) {
+        const auth = c.req.raw.headers.get("x-custom-auth");
+        if (!auth || !passwords.includes(auth)) {
+            return c.text("Unauthorized", 401);
+        }
+    }
+
+    const normalizedAddress = address.toLowerCase();
+    let addressId: number | null | undefined = null;
+    let publicAccess = 0;
+    try {
+        const result = await c.env.DB.prepare(
+            `SELECT id, public_access FROM address where name = ? `
+        ).bind(normalizedAddress).first<{
+            id: number;
+            public_access: number | null;
+        }>();
+        addressId = result?.id;
+        publicAccess = result?.public_access ? 1 : 0;
+    } catch (error) {
+        console.warn("Failed to query public_access, fallback to legacy behavior", error);
+        addressId = await c.env.DB.prepare(
+            `SELECT id FROM address where name = ? `
+        ).bind(normalizedAddress).first("id");
+        publicAccess = 1;
+    }
+    if (!addressId) {
+        return c.text("Invalid address", 404);
+    }
+    if (!publicAccess) {
+        return c.text("Address is private", 403);
+    }
+    const jwt = await Jwt.sign({
+        address: normalizedAddress,
+        address_id: addressId
+    }, c.env.JWT_SECRET, "HS256");
+    return c.json({ jwt });
 })
 
 export { api }

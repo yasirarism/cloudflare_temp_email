@@ -34,7 +34,8 @@ const fetchMailData = async (limit, offset) => {
         `/user_api/mails`
         + `?limit=${limit}`
         + `&offset=${offset}`
-        + (addressFilter.value ? `&address=${addressFilter.value}` : '')
+        + (addressFilter.value ? `&address=${addressFilter.value}` : ''),
+        { loading: false }
     );
 }
 

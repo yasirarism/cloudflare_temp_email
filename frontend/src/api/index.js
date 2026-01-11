@@ -19,7 +19,10 @@ const instance = axios.create({
 });
 
 const apiFetch = async (path, options = {}) => {
-    loading.value = true;
+    const shouldToggleLoading = options.loading !== false;
+    if (shouldToggleLoading) {
+        loading.value = true;
+    }
     try {
         // Get browser fingerprint for request tracking
         const fingerprint = await getFingerprint();
@@ -34,7 +37,7 @@ const apiFetch = async (path, options = {}) => {
                 'x-custom-auth': auth.value,
                 'x-admin-auth': adminAuth.value,
                 'x-fingerprint': fingerprint,
-                'Authorization': `Bearer ${jwt.value}`,
+                'Authorization': `Bearer ${options.jwt || jwt.value}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -55,7 +58,34 @@ const apiFetch = async (path, options = {}) => {
         }
         throw error;
     } finally {
-        loading.value = false;
+        if (shouldToggleLoading) {
+            loading.value = false;
+        }
+    }
+}
+
+const openApiFetch = async (path, options = {}) => {
+    try {
+        const fingerprint = await getFingerprint();
+        const response = await instance.request(path, {
+            method: options.method || 'GET',
+            data: options.body || null,
+            headers: {
+                'x-lang': i18n.global.locale.value,
+                'x-custom-auth': auth.value,
+                'x-fingerprint': fingerprint,
+                'Content-Type': 'application/json',
+            },
+        });
+        if (response.status >= 300) {
+            throw new Error(`[${response.status}]: ${response.data}` || "error");
+        }
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw new Error(`Code ${error.response.status}: ${error.response.data}` || "error");
+        }
+        throw error;
     }
 }
 
@@ -127,6 +157,7 @@ const getSettings = async () => {
             address: res["address"],
             auto_reply: res["auto_reply"],
             send_balance: res["send_balance"],
+            public_access: !!res["public_access"],
         };
     } finally {
         settings.value.fetched = true;
@@ -200,6 +231,10 @@ const bindUserAddress = async () => {
     }
 }
 
+const getPublicAddressJwt = async (address) => {
+    return await openApiFetch(`/open_api/address_jwt?address=${encodeURIComponent(address)}`);
+}
+
 export const api = {
     fetch: apiFetch,
     getSettings,
@@ -209,4 +244,5 @@ export const api = {
     adminShowAddressCredential,
     adminDeleteAddress,
     bindUserAddress,
+    getPublicAddressJwt,
 }

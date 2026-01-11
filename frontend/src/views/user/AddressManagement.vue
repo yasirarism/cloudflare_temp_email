@@ -2,7 +2,7 @@
 import { ref, h, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router';
-import { NBadge, NPopconfirm, NButton } from 'naive-ui'
+import { NBadge, NPopconfirm, NButton, NSwitch } from 'naive-ui'
 
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
@@ -10,7 +10,7 @@ import { getRouterPathWithLang } from '../../utils'
 
 import Login from '../common/Login.vue';
 
-const { jwt } = useGlobalState()
+const { jwt, settings } = useGlobalState()
 const message = useMessage()
 const router = useRouter()
 
@@ -30,6 +30,9 @@ const { locale, t } = useI18n({
             transferAddressTip: 'Transfer address to another user will remove the address from your account and transfer it to another user. Are you sure to transfer the address?',
             address: 'Address',
             create_or_bind: 'Create or Bind',
+            publicAccess: 'Public Access',
+            publicAccessEnabled: 'Public',
+            publicAccessDisabled: 'Private',
         },
         zh: {
             success: '成功',
@@ -45,6 +48,9 @@ const { locale, t } = useI18n({
             transferAddressTip: '转移地址到其他用户将会从你的账户中移除此地址并转移给其他用户。确定要转移地址吗？',
             address: '地址',
             create_or_bind: '创建或绑定',
+            publicAccess: '公开访问',
+            publicAccessEnabled: '公开',
+            publicAccessDisabled: '私有',
         }
     }
 });
@@ -127,10 +133,32 @@ const fetchData = async () => {
     }
 }
 
+const updatePublicAccess = async (row, enabled) => {
+    try {
+        await api.fetch(`/user_api/address_visibility`, {
+            method: 'POST',
+            body: JSON.stringify({
+                address_id: row.id,
+                public_access: enabled,
+            })
+        });
+        row.public_access = enabled ? 1 : 0;
+        if (row.name === settings.value.address) {
+            settings.value.public_access = enabled;
+        }
+        message.success(t('success'));
+    } catch (error) {
+        message.error(error.message || "error");
+    }
+}
+
 const columns = [
     {
         title: t('name'),
-        key: "name"
+        key: "name",
+        render(row) {
+            return h('span', { class: 'address-cell' }, row.name)
+        }
     },
     {
         title: t('mail_count'),
@@ -160,7 +188,14 @@ const columns = [
         title: t('actions'),
         key: 'actions',
         render(row) {
-            return h('div', [
+            return h('div', { class: 'action-group' }, [
+                h(NSwitch, {
+                    value: !!row.public_access,
+                    'onUpdate:value': (value) => updatePublicAccess(row, value),
+                }, {
+                    checked: () => t('publicAccessEnabled'),
+                    unchecked: () => t('publicAccessDisabled'),
+                }),
                 h(NPopconfirm,
                     {
                         onPositiveClick: () => changeMailAddress(row.id)
@@ -242,6 +277,45 @@ onMounted(async () => {
 
 <style scoped>
 .n-data-table {
-    min-width: 700px;
+    min-width: 100%;
+}
+
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.address-cell {
+    display: inline-block;
+    max-width: 220px;
+    width: 100%;
+    white-space: normal;
+    word-break: break-word;
+}
+
+@media (max-width: 720px) {
+    .action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-group :deep(.n-button),
+    .action-group :deep(.n-switch) {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .action-group :deep(.n-button__content) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .address-cell {
+        max-width: 160px;
+    }
 }
 </style>

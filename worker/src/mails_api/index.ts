@@ -97,9 +97,19 @@ api.get('/api/settings', async (c) => {
     const balance = is_no_limit_send_balance ? 99999 : await c.env.DB.prepare(
         `SELECT balance FROM address_sender where address = ? and enabled = 1`
     ).bind(address).first("balance");
+    let publicAccess = 0;
+    try {
+        const publicAccessResult = await c.env.DB.prepare(
+            `SELECT public_access FROM address where name = ? `
+        ).bind(address).first("public_access");
+        publicAccess = publicAccessResult ? 1 : 0;
+    } catch (error) {
+        console.warn("Failed to read public_access", error);
+    }
     return c.json({
         address: address,
         send_balance: balance || 0,
+        public_access: publicAccess,
     });
 })
 
@@ -114,7 +124,7 @@ api.post('/api/new_address', async (c) => {
         return c.text(msgs.NewAddressDisabledMsg, 403)
     }
     // eslint-disable-next-line prefer-const
-    let { name, domain, cf_token } = await c.req.json();
+    let { name, domain, cf_token, public_access } = await c.req.json();
     // check cf turnstile
     try {
         await checkCfTurnstile(c, cf_token);
@@ -151,7 +161,8 @@ api.post('/api/new_address', async (c) => {
             enablePrefix: true,
             checkLengthByConfig: true,
             addressPrefix,
-            sourceMeta
+            sourceMeta,
+            publicAccess: !!public_access,
         });
         return c.json(res);
     } catch (e) {
@@ -199,6 +210,43 @@ api.delete('/api/clear_sent_items', async (c) => {
     return c.json({
         success: success
     })
+})
+
+api.post('/api/address_visibility', async (c) => {
+    const msgs = i18n.getMessagesbyContext(c);
+    const { address } = c.get("jwtPayload")
+    const { public_access } = await c.req.json();
+    if (typeof public_access !== "boolean") {
+        return c.text(msgs.InvalidAddressMsg, 400)
+    }
+    let success = false;
+    try {
+        const result = await c.env.DB.prepare(
+            `UPDATE address SET public_access = ? WHERE name = ?`
+        ).bind(public_access ? 1 : 0, address).run();
+        success = result.success;
+    } catch (error) {
+        const message = (error as Error).message || "";
+        if (message.includes("public_access")) {
+            try {
+                await c.env.DB.exec(
+                    `ALTER TABLE address ADD COLUMN public_access INTEGER DEFAULT 0;`
+                );
+                const result = await c.env.DB.prepare(
+                    `UPDATE address SET public_access = ? WHERE name = ?`
+                ).bind(public_access ? 1 : 0, address).run();
+                success = result.success;
+            } catch (innerError) {
+                console.error(innerError);
+            }
+        } else {
+            console.error(error);
+        }
+    }
+    if (!success) {
+        return c.text(msgs.OperationFailedMsg, 500)
+    }
+    return c.json({ success: true })
 })
 
 api.post('/api/address_change_password', address_auth.changePassword)

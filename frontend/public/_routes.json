@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/api/*",
+    "/open_api/*",
+    "/user_api/*",
+    "/admin/*",
+    "/telegram/*",
+    "/external/*"
+  ]
+}

@@ -44,7 +44,7 @@ api.get('/admin/address', async (c) => {
 })
 
 api.post('/admin/new_address', async (c) => {
-    const { name, domain, enablePrefix } = await c.req.json();
+    const { name, domain, enablePrefix, public_access } = await c.req.json();
     const msgs = i18n.getMessagesbyContext(c);
     if (!name) {
         return c.text(msgs.RequiredFieldMsg, 400)
@@ -56,7 +56,8 @@ api.post('/admin/new_address', async (c) => {
             addressPrefix: null,
             checkAllowDomains: false,
             enableCheckNameRegex: false,
-            sourceMeta: 'admin'
+            sourceMeta: 'admin',
+            publicAccess: !!public_access,
         });
 
         return c.json(res);
@@ -91,6 +92,43 @@ api.delete('/admin/delete_address/:id', async (c) => {
     return c.json({
         success: success && mailSuccess && sendAccess && usersAddressSuccess
     })
+})
+
+api.post('/admin/address_visibility/:id', async (c) => {
+    const msgs = i18n.getMessagesbyContext(c);
+    const { id } = c.req.param();
+    const { public_access } = await c.req.json();
+    if (!id || typeof public_access !== "boolean") {
+        return c.text(msgs.InvalidAddressMsg, 400)
+    }
+    let success = false;
+    try {
+        const result = await c.env.DB.prepare(
+            `UPDATE address SET public_access = ? WHERE id = ?`
+        ).bind(public_access ? 1 : 0, id).run();
+        success = result.success;
+    } catch (error) {
+        const message = (error as Error).message || "";
+        if (message.includes("public_access")) {
+            try {
+                await c.env.DB.exec(
+                    `ALTER TABLE address ADD COLUMN public_access INTEGER DEFAULT 0;`
+                );
+                const result = await c.env.DB.prepare(
+                    `UPDATE address SET public_access = ? WHERE id = ?`
+                ).bind(public_access ? 1 : 0, id).run();
+                success = result.success;
+            } catch (innerError) {
+                console.error(innerError);
+            }
+        } else {
+            console.error(error);
+        }
+    }
+    if (!success) {
+        return c.text(msgs.OperationFailedMsg, 500)
+    }
+    return c.json({ success: true })
 })
 
 api.delete('/admin/clear_inbox/:id', async (c) => {

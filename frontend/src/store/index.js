@@ -42,6 +42,7 @@ export const useGlobalState = createGlobalState(
             fetched: false,
             send_balance: 0,
             address: '',
+            public_access: false,
             auto_reply: {
                 subject: '',
                 message: '',
@@ -61,6 +62,7 @@ export const useGlobalState = createGlobalState(
         const showAuth = ref(false);
         const showAddressCredential = ref(false);
         const showAdminAuth = ref(false);
+        const publicAccessError = ref('');
         const auth = useStorage('auth', '');
         const adminAuth = useStorage('adminAuth', '');
         const jwt = useStorage('jwt', '');
@@ -77,7 +79,7 @@ export const useGlobalState = createGlobalState(
         const globalTabplacement = useStorage('globalTabplacement', 'top');
         const useSideMargin = useStorage('useSideMargin', true);
         const useUTCDate = useStorage('useUTCDate', false);
-        const autoRefresh = useStorage('autoRefresh', false);
+        const autoRefresh = useStorage('autoRefresh', true);
         const configAutoRefreshInterval = useStorage("configAutoRefreshInterval", 60);
         const userOpenSettings = ref({
             fetched: false,
@@ -122,6 +124,7 @@ export const useGlobalState = createGlobalState(
             openSettings,
             showAuth,
             showAddressCredential,
+            publicAccessError,
             auth,
             jwt,
             adminAuth,

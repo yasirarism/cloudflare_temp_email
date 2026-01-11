@@ -161,6 +161,7 @@ const UserBindAddressModule = {
         ).bind(user_id).all<{
             id: number;
             name: string;
+            public_access?: number;
             mail_count: number;
             send_count: number;
             created_at: string;
@@ -194,6 +195,48 @@ const UserBindAddressModule = {
         return c.json({
             jwt: jwt
         })
+    },
+    updateAddressVisibility: async (c: Context<HonoCustomType>) => {
+        const msgs = i18n.getMessagesbyContext(c);
+        const { user_id } = c.get("userPayload");
+        const { address_id, public_access } = await c.req.json();
+        if (!address_id || typeof public_access !== "boolean") {
+            return c.text(msgs.InvalidAddressOrUserTokenMsg, 400)
+        }
+        const db_user_id = await c.env.DB.prepare(
+            `SELECT user_id FROM users_address WHERE address_id = ? and user_id = ?`
+        ).bind(address_id, user_id).first("user_id");
+        if (!db_user_id) {
+            return c.text(msgs.AddressNotBindedMsg, 400)
+        }
+        let success = false;
+        try {
+            const result = await c.env.DB.prepare(
+                `UPDATE address SET public_access = ? WHERE id = ?`
+            ).bind(public_access ? 1 : 0, address_id).run();
+            success = result.success;
+        } catch (error) {
+            const message = (error as Error).message || "";
+            if (message.includes("public_access")) {
+                try {
+                    await c.env.DB.exec(
+                        `ALTER TABLE address ADD COLUMN public_access INTEGER DEFAULT 0;`
+                    );
+                    const result = await c.env.DB.prepare(
+                        `UPDATE address SET public_access = ? WHERE id = ?`
+                    ).bind(public_access ? 1 : 0, address_id).run();
+                    success = result.success;
+                } catch (innerError) {
+                    console.error(innerError);
+                }
+            } else {
+                console.error(error);
+            }
+        }
+        if (!success) {
+            return c.text(msgs.OperationFailedMsg, 500)
+        }
+        return c.json({ success: true })
     },
     transferAddress: async (c: Context<HonoCustomType>) => {
         const msgs = i18n.getMessagesbyContext(c);

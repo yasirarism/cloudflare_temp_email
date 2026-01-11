@@ -19,13 +19,14 @@ const props = defineProps({
     },
     newAddressPath: {
         type: Function,
-        default: async (address_name, domain, cf_token) => {
+        default: async (address_name, domain, cf_token, public_access) => {
             return await api.fetch("/api/new_address", {
                 method: "POST",
                 body: JSON.stringify({
                     name: address_name,
                     domain: domain,
                     cf_token: cf_token,
+                    public_access: public_access,
                 }),
             });
         },
@@ -47,6 +48,7 @@ const credential = ref('')
 const emailName = ref("")
 const emailDomain = ref("")
 const cfToken = ref("")
+const publicAccess = ref(false)
 const loginMethod = ref('credential') // 'credential' or 'password'
 const loginAddress = ref('')
 const loginPassword = ref('')
@@ -129,6 +131,7 @@ const { locale, t } = useI18n({
             email: 'Email',
             password: 'Password',
             emailPasswordRequired: 'Email and password are required',
+            publicAccess: 'Public access',
         },
         zh: {
             login: '登录',
@@ -151,6 +154,7 @@ const { locale, t } = useI18n({
             email: '邮箱',
             password: '密码',
             emailPasswordRequired: '邮箱和密码不能为空',
+            publicAccess: '公开访问',
         }
     }
 });
@@ -203,8 +207,10 @@ const newEmail = async () => {
         const res = await props.newAddressPath(
             nameToSend,
             emailDomain.value,
-            cfToken.value
+            cfToken.value,
+            publicAccess.value
         );
+        publicAccess.value = false;
         jwt.value = res["jwt"];
         addressPassword.value = res["password"] || '';
         await api.getSettings();
@@ -335,6 +341,9 @@ onMounted(async () => {
                             <n-select v-model:value="emailDomain" :consistent-menu-width="false"
                                 :options="domainsOptions" />
                         </n-input-group>
+                        <n-form-item-row :label="t('publicAccess')">
+                            <n-switch v-model:value="publicAccess" :round="false" />
+                        </n-form-item-row>
                         <Turnstile v-model:value="cfToken" />
                         <n-button type="primary" block secondary strong @click="newEmail" :loading="loading">
                             <template #icon>

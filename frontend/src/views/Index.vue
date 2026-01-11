@@ -65,11 +65,11 @@ const { t } = useI18n({
 
 const fetchMailData = async (limit, offset) => {
   if (mailIdQuery.value > 0) {
-    const singleMail = await api.fetch(`/api/mail/${mailIdQuery.value}`);
+    const singleMail = await api.fetch(`/api/mail/${mailIdQuery.value}`, { loading: false });
     if (singleMail) return { results: [singleMail], count: 1 };
     return { results: [], count: 0 };
   }
-  return await api.fetch(`/api/mails?limit=${limit}&offset=${offset}`);
+  return await api.fetch(`/api/mails?limit=${limit}&offset=${offset}`, { loading: false });
 };
 
 const deleteMail = async (curMailId) => {
@@ -81,7 +81,7 @@ const deleteSenboxMail = async (curMailId) => {
 };
 
 const fetchSenboxData = async (limit, offset) => {
-  return await api.fetch(`/api/sendbox?limit=${limit}&offset=${offset}`);
+  return await api.fetch(`/api/sendbox?limit=${limit}&offset=${offset}`, { loading: false });
 };
 
 const saveToS3 = async (mail_id, filename, blob) => {

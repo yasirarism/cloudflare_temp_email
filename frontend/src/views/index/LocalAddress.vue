@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, h, computed } from 'vue';
+import { ref, h, computed, watch } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 import { useI18n } from 'vue-i18n'
-import { NPopconfirm, NButton } from 'naive-ui'
+import { NPopconfirm, NButton, NSwitch } from 'naive-ui'
 
 // @ts-ignore
 import { useGlobalState } from '../../store'
+import { api } from '../../api'
 // @ts-ignore
 import Login from '../common/Login.vue';
 
-const { jwt } = useGlobalState()
+const { jwt, settings } = useGlobalState()
 // @ts-ignore
 const message = useMessage()
 
@@ -24,22 +25,30 @@ const { t } = useI18n({
             unbindMailAddress: 'Unbind Mail Address credential',
             create_or_bind: 'Create or Bind',
             bindAddressSuccess: 'Bind Address Success',
+            publicAccess: 'Public Access',
+            publicAccessEnabled: 'Public',
+            publicAccessDisabled: 'Private',
         },
-        zh: {
-            tip: '这些地址存储在您的浏览器中，如果您清除浏览器缓存，可能会丢失。',
-            success: '成功',
-            address: '地址',
-            actions: '操作',
-            changeMailAddress: '切换邮箱地址',
-            unbindMailAddress: '解绑邮箱地址',
-            create_or_bind: '创建或绑定',
-            bindAddressSuccess: '绑定地址成功',
+        id: {
+            tip: 'Alamat ini disimpan di browser Anda dan bisa hilang jika cache browser dihapus.',
+            success: 'berhasil',
+            address: 'Alamat',
+            actions: 'Aksi',
+            changeMailAddress: 'Ganti Alamat',
+            unbindMailAddress: 'Lepas Kredensial Alamat',
+            create_or_bind: 'Buat atau Kaitkan',
+            bindAddressSuccess: 'Berhasil mengaitkan alamat',
+            publicAccess: 'Akses Publik',
+            publicAccessEnabled: 'Publik',
+            publicAccessDisabled: 'Private',
         }
     }
 });
 
 const tabValue = ref('address')
 const localAddressCache = useLocalStorage("LocalAddressCache", []);
+const publicAccessMap = ref({});
+const publicAccessLoading = ref({});
 const data = computed(() => {
     // @ts-ignore
     if (!localAddressCache.value.includes(jwt.value)) {
@@ -71,6 +80,45 @@ const data = computed(() => {
 
 })
 
+const fetchPublicAccess = async (row: { jwt: string; valid: boolean }) => {
+    if (!row?.valid || !row.jwt) return;
+    if (publicAccessMap.value[row.jwt] !== undefined) return;
+    if (publicAccessLoading.value[row.jwt]) return;
+    publicAccessLoading.value[row.jwt] = true;
+    try {
+        const res = await api.fetch("/api/settings", { jwt: row.jwt, loading: false });
+        publicAccessMap.value[row.jwt] = !!res?.public_access;
+    } catch (error) {
+        publicAccessMap.value[row.jwt] = null;
+    } finally {
+        publicAccessLoading.value[row.jwt] = false;
+    }
+};
+
+watch(data, (rows) => {
+    rows.forEach((row) => fetchPublicAccess(row));
+}, { immediate: true });
+
+const updatePublicAccess = async (row: { jwt: string; valid: boolean }, enabled: boolean) => {
+    if (!row?.valid || !row.jwt) return;
+    try {
+        await api.fetch(`/api/address_visibility`, {
+            method: 'POST',
+            body: JSON.stringify({
+                public_access: enabled,
+            }),
+            jwt: row.jwt,
+        });
+        publicAccessMap.value[row.jwt] = enabled;
+        if (row.jwt === jwt.value) {
+            settings.value.public_access = enabled;
+        }
+        message.success(t('success'));
+    } catch (error) {
+        message.error((error as Error).message || "error");
+    }
+};
+
 const bindAddress = async () => {
     try {
         // @ts-ignore
@@ -89,12 +137,32 @@ const columns = [
     {
         title: t('address'),
         key: "address"
+        ,
+        render(row: any) {
+            return h('span', { class: 'address-cell' }, row.address)
+        }
+    },
+    {
+        title: t('publicAccess'),
+        key: "public_access",
+        render(row: any) {
+            const accessValue = publicAccessMap.value[row.jwt];
+            return h(NSwitch, {
+                value: !!accessValue,
+                disabled: !row.valid || accessValue === null,
+                loading: !!publicAccessLoading.value[row.jwt],
+                'onUpdate:value': (value: boolean) => updatePublicAccess(row, value),
+            }, {
+                checked: () => t('publicAccessEnabled'),
+                unchecked: () => t('publicAccessDisabled'),
+            })
+        }
     },
     {
         title: t('actions'),
         key: 'actions',
         render(row: any) {
-            return h('div', [
+            return h('div', { class: 'action-group' }, [
                 h(NPopconfirm,
                     {
                         onPositiveClick: () => {
@@ -145,7 +213,7 @@ const columns = [
 <template>
     <div>
         <n-alert type="warning" :show-icon="false" :bordered="false">
-            <span>{{ t('tip') }}</span>
+            <span class="local-address-tip">{{ t('tip') }}</span>
         </n-alert>
         <n-tabs type="segment" v-model:value="tabValue">
             <n-tab-pane name="address" :tab="t('address')">
@@ -157,3 +225,49 @@ const columns = [
         </n-tabs>
     </div>
 </template>
+
+<style scoped>
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.local-address-tip {
+    display: inline-block;
+    word-break: break-word;
+}
+
+.address-cell {
+    display: inline-block;
+    max-width: 220px;
+    width: 100%;
+    white-space: normal;
+    word-break: break-word;
+}
+
+@media (max-width: 720px) {
+    .action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-group :deep(.n-button),
+    .action-group :deep(.n-switch) {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .action-group :deep(.n-button__content) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .address-cell {
+        max-width: 160px;
+    }
+}
+</style>

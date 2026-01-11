@@ -3,7 +3,7 @@ import { watch, onMounted, ref, onBeforeUnmount, computed } from "vue";
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useGlobalState } from '../store'
-import { CloudDownloadRound, ArrowBackIosNewFilled, ArrowForwardIosFilled } from '@vicons/material'
+import { CloudDownloadRound, ArrowBackIosNewFilled, ArrowForwardIosFilled, AutorenewRound } from '@vicons/material'
 import { useIsMobile } from '../utils/composables'
 import { processItem } from '../utils/email-parser'
 import { utcToLocalDate } from '../utils';
@@ -54,17 +54,28 @@ const props = defineProps({
     default: false,
     required: false
   },
+  enableRealtime: {
+    type: Boolean,
+    default: true,
+    required: false
+  },
 })
 
 const localFilterKeyword = ref('')
 
 const {
-  isDark, mailboxSplitSize, indexTab, loading, useUTCDate,
+  isDark, mailboxSplitSize, indexTab, useUTCDate,
   autoRefresh, configAutoRefreshInterval, sendMailModel
 } = useGlobalState()
+const mailLoading = ref(false)
 const autoRefreshInterval = ref(configAutoRefreshInterval.value)
+const pageRefreshOptions = ref(null)
 const rawData = ref([])
 const timer = ref(null)
+const realtimeTimer = ref(null)
+const latestMailId = ref(null)
+const processedCache = new Map()
+const realtimeIntervalMs = 5000
 
 const count = ref(0)
 const page = ref(1)
@@ -196,11 +207,11 @@ const setupAutoRefresh = async (autoRefresh) => {
   if (autoRefresh) {
     clearInterval(timer.value);
     timer.value = setInterval(async () => {
-      if (loading.value) return;
+      if (mailLoading.value) return;
       autoRefreshInterval.value--;
       if (autoRefreshInterval.value <= 0) {
         autoRefreshInterval.value = configAutoRefreshInterval.value;
-        await backFirstPageAndRefresh();
+        await backFirstPageAndRefresh({ showLoading: false, preserveSelection: true });
       }
     }, 1000)
   } else {
@@ -209,45 +220,101 @@ const setupAutoRefresh = async (autoRefresh) => {
   }
 }
 
+const buildProcessedItem = async (item) => {
+  const cached = processedCache.get(item.id);
+  if (cached && cached.raw === item.raw) {
+    return { ...cached, checked: false };
+  }
+  const processed = await processItem({ ...item });
+  processedCache.set(item.id, processed);
+  return { ...processed, checked: false };
+}
+
 watch(autoRefresh, async (autoRefresh, old) => {
   setupAutoRefresh(autoRefresh)
 }, { immediate: true })
 
 watch([page, pageSize], async ([page, pageSize], [oldPage, oldPageSize]) => {
   if (page !== oldPage || pageSize !== oldPageSize) {
-    await refresh();
+    const options = pageRefreshOptions.value || undefined;
+    pageRefreshOptions.value = null;
+    await refresh(options);
   }
 })
 
-const refresh = async () => {
+const refresh = async ({ showLoading = true, preserveSelection = true } = {}) => {
+  if (showLoading) {
+    mailLoading.value = true;
+  }
   try {
     const { results, count: totalCount } = await props.fetchMailData(
       pageSize.value, (page.value - 1) * pageSize.value
     );
-    loading.value = true;
-    rawData.value = await Promise.all(results.map(async (item) => {
-      item.checked = false;
-      return await processItem(item);
-    }));
-    if (totalCount > 0) {
+    const processedResults = await Promise.all(
+      results.map(async (item) => buildProcessedItem(item))
+    );
+    rawData.value = processedResults;
+    if (typeof totalCount === 'number' && totalCount >= 0) {
       count.value = totalCount;
     }
-    curMail.value = null;
-    if (!isMobile.value && data.value.length > 0) {
-      curMail.value = data.value[0];
+    if (processedResults.length > 0) {
+      latestMailId.value = processedResults[0].id;
+    }
+    if (preserveSelection && curMail.value) {
+      const updatedSelection = processedResults.find(mail => mail.id === curMail.value.id);
+      curMail.value = updatedSelection || (!isMobile.value ? processedResults[0] || null : null);
+    } else {
+      curMail.value = !isMobile.value && processedResults.length > 0
+        ? processedResults[0]
+        : null;
     }
   } catch (error) {
     message.error(error.message || "error");
     console.error(error);
   } finally {
-    loading.value = false;
+    if (showLoading) {
+      mailLoading.value = false;
+    }
   }
 };
 
-const backFirstPageAndRefresh = async () => {
+const backFirstPageAndRefresh = async ({ showLoading = true, preserveSelection = true } = {}) => {
+  if (page.value === 1) {
+    await refresh({ showLoading, preserveSelection });
+    return;
+  }
+  pageRefreshOptions.value = { showLoading, preserveSelection };
   page.value = 1;
-  await refresh();
 }
+
+const checkForNewMail = async () => {
+  if (!props.enableRealtime || autoRefresh.value || mailLoading.value || page.value !== 1) {
+    return;
+  }
+  try {
+    const { results, count: totalCount } = await props.fetchMailData(1, 0);
+    if (typeof totalCount === 'number' && totalCount >= 0) {
+      count.value = totalCount;
+    }
+    const latestId = results?.[0]?.id || null;
+    if (latestId && latestId !== latestMailId.value) {
+      await refresh({ showLoading: false, preserveSelection: false });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const startRealtime = () => {
+  clearInterval(realtimeTimer.value);
+  realtimeTimer.value = null;
+  if (!props.enableRealtime || autoRefresh.value) {
+    return;
+  }
+  realtimeTimer.value = setInterval(checkForNewMail, realtimeIntervalMs);
+}
+
+watch([() => props.enableRealtime, autoRefresh], startRealtime, { immediate: true })
 
 const clickRow = async (row) => {
   if (multiActionMode.value) {
@@ -264,12 +331,15 @@ const mailItemClass = (row) => {
 
 const deleteMail = async () => {
   try {
+    mailLoading.value = true;
     await props.deleteMail(curMail.value.id);
     message.success(t("success"));
     curMail.value = null;
     await refresh();
   } catch (error) {
     message.error(error.message || "error");
+  } finally {
+    mailLoading.value = false;
   }
 };
 
@@ -331,7 +401,7 @@ const multiActionSelectAll = (checked) => {
 
 const multiActionDeleteMail = async () => {
   try {
-    loading.value = true;
+    mailLoading.value = true;
     const selectedMails = data.value.filter((item) => item.checked);
     if (selectedMails.length === 0) {
       message.error(t('pleaseSelectMail'));
@@ -354,14 +424,14 @@ const multiActionDeleteMail = async () => {
   } catch (error) {
     message.error(error.message || "error");
   } finally {
-    loading.value = false;
+    mailLoading.value = false;
     showMultiActionDelete.value = true;
   }
 }
 
 const multiActionDownload = async () => {
   try {
-    loading.value = true;
+    mailLoading.value = true;
     const selectedMails = data.value.filter((item) => item.checked);
     if (selectedMails.length === 0) {
       message.error(t('pleaseSelectMail'));
@@ -381,16 +451,27 @@ const multiActionDownload = async () => {
   } catch (error) {
     message.error(error.message || "error");
   } finally {
-    loading.value = false;
+    mailLoading.value = false;
   }
+}
+
+const manualRefreshSpin = ref(false)
+const triggerManualRefresh = async () => {
+  manualRefreshSpin.value = true;
+  await backFirstPageAndRefresh({ showLoading: true, preserveSelection: true });
+  setTimeout(() => {
+    manualRefreshSpin.value = false;
+  }, 1200);
 }
 
 onMounted(async () => {
   await refresh();
+  startRealtime();
 });
 
 onBeforeUnmount(() => {
   clearInterval(timer.value)
+  clearInterval(realtimeTimer.value)
 })
 </script>
 
@@ -427,15 +508,15 @@ onBeforeUnmount(() => {
           </n-button>
           <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" :page-sizes="[20, 50, 100]"
             show-size-picker />
-          <n-switch v-model:value="autoRefresh" :round="false">
-            <template #checked>
-              {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+          <n-tooltip>
+            <template #trigger>
+              <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading, 'is-manual': manualRefreshSpin }]">
+                <AutorenewRound />
+              </n-icon>
             </template>
-            <template #unchecked>
-              {{ t('autoRefresh') }}
-            </template>
-          </n-switch>
-          <n-button @click="backFirstPageAndRefresh" type="primary" tertiary>
+            {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+          </n-tooltip>
+          <n-button @click="triggerManualRefresh" type="primary" tertiary>
             {{ t('refresh') }}
           </n-button>
           <n-input v-if="showFilterInput" v-model:value="localFilterKeyword"
@@ -447,7 +528,7 @@ onBeforeUnmount(() => {
         :on-update:size="onSpiltSizeChange">
         <template #1>
           <div style="overflow: auto; min-height: 50vh; max-height: 100vh;">
-            <n-list hoverable clickable>
+            <n-list hoverable clickable class="glass-panel">
               <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
                 :class="mailItemClass(row)">
                 <template #prefix v-if="multiActionMode">
@@ -499,13 +580,13 @@ onBeforeUnmount(() => {
               </n-button>
             </n-flex>
           </div>
-          <n-card :bordered="false" embedded v-if="curMail" class="mail-item" :title="curMail.subject"
+          <n-card :bordered="false" embedded v-if="curMail" class="mail-item glass-panel" :title="curMail.subject"
             style="overflow: auto; max-height: 100vh;">
             <MailContentRenderer :mail="curMail" :showEMailTo="showEMailTo"
               :enableUserDeleteEmail="enableUserDeleteEmail" :showReply="showReply" :showSaveS3="showSaveS3"
               :onDelete="deleteMail" :onReply="replyMail" :onForward="forwardMail" :onSaveToS3="saveToS3Proxy" />
           </n-card>
-          <n-card :bordered="false" embedded class="mail-item" v-else>
+          <n-card :bordered="false" embedded class="mail-item glass-panel" v-else>
             <n-result status="info" :title="t('pleaseSelectMail')">
             </n-result>
           </n-card>
@@ -515,15 +596,15 @@ onBeforeUnmount(() => {
     <div class="left" v-else>
       <n-space justify="space-around" align="center" :wrap="false" style="display: flex; align-items: center;">
         <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" simple size="small" />
-        <n-switch v-model:value="autoRefresh" size="small" :round="false">
-          <template #checked>
-            {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+        <n-tooltip>
+          <template #trigger>
+            <n-icon :class="['auto-refresh-spinner', { 'is-active': mailLoading, 'is-manual': manualRefreshSpin }]">
+              <AutorenewRound />
+            </n-icon>
           </template>
-          <template #unchecked>
-            {{ t('autoRefresh') }}
-          </template>
-        </n-switch>
-        <n-button @click="backFirstPageAndRefresh" tertiary size="small" type="primary">
+          {{ t('refreshAfter', { msg: autoRefreshInterval }) }}
+        </n-tooltip>
+        <n-button @click="triggerManualRefresh" tertiary size="small" type="primary">
           {{ t('refresh') }}
         </n-button>
       </n-space>
@@ -532,7 +613,7 @@ onBeforeUnmount(() => {
           :placeholder="t('keywordQueryTip')" size="small" clearable />
       </div>
       <div style="overflow: auto; height: 80vh;">
-        <n-list hoverable clickable>
+        <n-list hoverable clickable class="glass-panel">
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
             <n-thing :title="row.subject">
               <template #description>
@@ -561,7 +642,7 @@ onBeforeUnmount(() => {
       <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
-          <n-card :bordered="false" embedded style="overflow: auto;">
+          <n-card :bordered="false" embedded style="overflow: auto;" class="glass-panel">
             <MailContentRenderer :mail="curMail" :showEMailTo="showEMailTo"
               :enableUserDeleteEmail="enableUserDeleteEmail" :showReply="showReply" :showSaveS3="showSaveS3"
               :useUTCDate="useUTCDate" :onDelete="deleteMail" :onReply="replyMail" :onForward="forwardMail"
@@ -609,15 +690,41 @@ onBeforeUnmount(() => {
 }
 
 .overlay-dark-backgroud {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--glass-selection-bg);
 }
 
 .overlay-light-backgroud {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--glass-selection-bg);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop-blur));
 }
 
 .mail-item {
   height: 100%;
+}
+
+.auto-refresh-spinner {
+  font-size: 18px;
+}
+
+.auto-refresh-spinner.is-active {
+  animation: spin 1.2s linear infinite;
+}
+
+.auto-refresh-spinner.is-manual {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 pre {

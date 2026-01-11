@@ -24,7 +24,8 @@ const fetchData = async (limit, offset) => {
     adminSendBoxTabAddress.value = adminSendBoxTabAddress.value.trim();
     return await api.fetch(
         `/admin/sendbox?limit=${limit}&offset=${offset}`
-        + (adminSendBoxTabAddress.value ? `&address=${adminSendBoxTabAddress.value}` : '')
+        + (adminSendBoxTabAddress.value ? `&address=${adminSendBoxTabAddress.value}` : ''),
+        { loading: false }
     );
 }
 

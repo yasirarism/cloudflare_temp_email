@@ -1,6 +1,6 @@
 <script setup>
 import { ref, h, onMounted, watch, computed } from 'vue';
-import { NBadge, useMessage } from 'naive-ui'
+import { NBadge, useMessage, NSwitch } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import { useGlobalState } from '../../store'
@@ -53,6 +53,9 @@ const { t } = useI18n({
             multiClearInboxTip: 'Are you sure to clear inbox for selected addresses?',
             multiClearSentItems: 'Multi Clear Sent Items',
             multiClearSentItemsTip: 'Are you sure to clear sent items for selected addresses?',
+            publicAccess: 'Public Access',
+            publicAccessEnabled: 'Public',
+            publicAccessDisabled: 'Private',
         },
         zh: {
             name: '名称',
@@ -91,6 +94,9 @@ const { t } = useI18n({
             multiClearInboxTip: '确定要清空选中邮箱的收件箱吗？',
             multiClearSentItems: '批量清空发件箱',
             multiClearSentItemsTip: '确定要清空选中邮箱的发件箱吗？',
+            publicAccess: '公开访问',
+            publicAccessEnabled: '公开',
+            publicAccessDisabled: '私有',
         }
     }
 });
@@ -171,6 +177,21 @@ const clearSentItems = async () => {
         message.error(error.message || "error");
     } finally {
         showClearSentItems.value = false
+    }
+}
+
+const updatePublicAccess = async (row, enabled) => {
+    try {
+        await api.fetch(`/admin/address_visibility/${row.id}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                public_access: enabled,
+            })
+        });
+        row.public_access = enabled ? 1 : 0;
+        message.success(t("success"));
+    } catch (error) {
+        message.error(error.message || "error");
     }
 }
 
@@ -375,6 +396,19 @@ const columns = [
                     default: () => row.send_count > 0 ? t('viewSendBox') : ""
                 }
             )
+        }
+    },
+    {
+        title: t('publicAccess'),
+        key: 'public_access',
+        render(row) {
+            return h(NSwitch, {
+                value: !!row.public_access,
+                'onUpdate:value': (value) => updatePublicAccess(row, value),
+            }, {
+                checked: () => t('publicAccessEnabled'),
+                unchecked: () => t('publicAccessDisabled'),
+            })
         }
     },
     {

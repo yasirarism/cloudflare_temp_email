@@ -41,7 +41,7 @@ const authFunc = async () => {
 }
 
 const changeLocale = async (lang) => {
-    if (lang == 'zh') {
+    if (lang === 'id') {
         await router.push(route.fullPath.replace('/en', ''));
     } else {
         await router.push(`/${lang}${route.fullPath}`);
@@ -61,16 +61,16 @@ const { locale, t } = useI18n({
             user: 'User',
             ok: 'OK',
         },
-        zh: {
-            title: 'Cloudflare 临时邮件',
-            dark: '暗色',
-            light: '亮色',
-            accessHeader: '访问密码',
-            accessTip: '请输入站点访问密码',
-            home: '主页',
-            menu: '菜单',
-            user: '用户',
-            ok: '确定',
+        id: {
+            title: 'Cloudflare Email Sementara',
+            dark: 'Gelap',
+            light: 'Terang',
+            accessHeader: 'Kata Sandi Akses',
+            accessTip: 'Masukkan kata sandi akses yang benar',
+            home: 'Beranda',
+            menu: 'Menu',
+            user: 'Pengguna',
+            ok: 'OK',
         }
     }
 });
@@ -166,12 +166,12 @@ const menuOptions = computed(() => [
                 size: "small",
                 style: "width: 100%",
                 onClick: async () => {
-                    locale.value == 'zh' ? await changeLocale('en') : await changeLocale('zh');
+                    locale.value == 'id' ? await changeLocale('en') : await changeLocale('id');
                     showMobileMenu.value = false;
                 }
             },
             {
-                default: () => locale.value == 'zh' ? "English" : "中文",
+                default: () => locale.value == 'id' ? "English" : "Indonesia",
                 icon: () => h(
                     NIcon, { component: Language }
                 )
@@ -248,7 +248,8 @@ onMounted(async () => {
             <template #extra>
                 <n-space>
                     <n-menu v-if="!isMobile" mode="horizontal" :options="menuOptions" responsive />
-                    <n-button v-else :text="true" @click="showMobileMenu = !showMobileMenu" style="margin-right: 10px;">
+                    <n-button v-else :text="true" class="menu-toggle" @click="showMobileMenu = !showMobileMenu"
+                        style="margin-right: 10px;">
                         <template #icon>
                             <n-icon :component="MenuFilled" />
                         </template>
@@ -257,7 +258,7 @@ onMounted(async () => {
                 </n-space>
             </template>
         </n-page-header>
-        <n-drawer v-model:show="showMobileMenu" placement="top" style="height: 100vh;">
+        <n-drawer v-model:show="showMobileMenu" placement="top" style="height: 60vh;">
             <n-drawer-content :title="t('menu')" closable>
                 <n-menu :options="menuOptions" />
             </n-drawer-content>
@@ -280,6 +281,17 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.menu-toggle {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    padding: 2px 10px;
+}
+
+.menu-toggle :deep(.n-button__content) {
+    color: inherit;
 }
 
 .n-alert {
