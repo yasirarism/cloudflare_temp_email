@@ -155,7 +155,10 @@ const updatePublicAccess = async (row, enabled) => {
 const columns = [
     {
         title: t('name'),
-        key: "name"
+        key: "name",
+        render(row) {
+            return h('span', { class: 'address-cell' }, row.name)
+        }
     },
     {
         title: t('mail_count'),
@@ -284,6 +287,14 @@ onMounted(async () => {
     align-items: center;
 }
 
+.address-cell {
+    display: inline-block;
+    max-width: 220px;
+    width: 100%;
+    white-space: normal;
+    word-break: break-word;
+}
+
 @media (max-width: 720px) {
     .action-group {
         flex-direction: column;
@@ -301,6 +312,10 @@ onMounted(async () => {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .address-cell {
+        max-width: 160px;
     }
 }
 </style>

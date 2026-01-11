@@ -21,11 +21,11 @@ const { t } = useI18n({
             user_settings: 'User Settings',
             bind_address: 'Bind Mail Address',
         },
-        zh: {
-            address_management: '地址管理',
-            user_mail_box_tab: '收件箱',
-            user_settings: '用户设置',
-            bind_address: '绑定邮箱地址',
+        id: {
+            address_management: 'Kelola Alamat',
+            user_mail_box_tab: 'Kotak Masuk',
+            user_settings: 'Pengaturan Pengguna',
+            bind_address: 'Kaitkan Alamat Email',
         }
     }
 });
