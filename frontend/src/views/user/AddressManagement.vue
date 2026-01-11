@@ -182,23 +182,17 @@ const columns = [
         }
     },
     {
-        title: t('publicAccess'),
-        key: 'public_access',
-        render(row) {
-            return h(NSwitch, {
-                value: !!row.public_access,
-                'onUpdate:value': (value) => updatePublicAccess(row, value),
-            }, {
-                checked: () => t('publicAccessEnabled'),
-                unchecked: () => t('publicAccessDisabled'),
-            })
-        }
-    },
-    {
         title: t('actions'),
         key: 'actions',
         render(row) {
-            return h('div', [
+            return h('div', { class: 'action-group' }, [
+                h(NSwitch, {
+                    value: !!row.public_access,
+                    'onUpdate:value': (value) => updatePublicAccess(row, value),
+                }, {
+                    checked: () => t('publicAccessEnabled'),
+                    unchecked: () => t('publicAccessDisabled'),
+                }),
                 h(NPopconfirm,
                     {
                         onPositiveClick: () => changeMailAddress(row.id)
@@ -280,6 +274,13 @@ onMounted(async () => {
 
 <style scoped>
 .n-data-table {
-    min-width: 700px;
+    min-width: 100%;
+}
+
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
 }
 </style>
