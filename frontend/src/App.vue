@@ -296,6 +296,8 @@ body,
   height: 100vh;
   text-align: center;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .n-grid {
