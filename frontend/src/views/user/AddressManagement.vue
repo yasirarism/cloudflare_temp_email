@@ -287,6 +287,10 @@ onMounted(async () => {
     align-items: center;
 }
 
+.action-group :deep(.n-button) {
+    min-width: 0;
+}
+
 .address-cell {
     display: inline-block;
     max-width: 220px;
@@ -308,7 +312,7 @@ onMounted(async () => {
     }
 
     .action-group :deep(.n-button__content) {
-        max-width: 120px;
+        max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

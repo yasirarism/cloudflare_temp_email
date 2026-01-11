@@ -250,8 +250,8 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
 
 .address-select {
     min-width: 0;
-    max-width: 420px;
-    flex: 1 1 220px;
+    max-width: none;
+    flex: 1 1 0;
 }
 
 .address-copy {
@@ -272,5 +272,9 @@ watch([userJwt, isTelegram, () => settings.value.address], async () => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.address-row :deep(.n-base-selection) {
+    min-width: 0;
 }
 </style>

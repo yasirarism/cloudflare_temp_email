@@ -283,6 +283,10 @@ onMounted(async () => {
     justify-content: space-between;
 }
 
+.n-page-header {
+    padding-top: 12px;
+}
+
 .menu-toggle {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
