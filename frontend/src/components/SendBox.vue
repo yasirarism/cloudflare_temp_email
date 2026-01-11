@@ -387,11 +387,11 @@ onMounted(async () => {
 }
 
 .overlay-dark-backgroud {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--glass-selection-bg);
 }
 
 .overlay-light-backgroud {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--glass-selection-bg);
 }
 
 .mail-item {

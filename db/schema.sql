@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS address (
     name TEXT UNIQUE,
     password TEXT,
     source_meta TEXT,
+    public_access INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
