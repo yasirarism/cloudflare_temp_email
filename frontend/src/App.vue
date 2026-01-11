@@ -150,6 +150,10 @@ body {
   background-attachment: fixed;
 }
 
+.glass-theme {
+  color: var(--glass-text-color);
+}
+
 html,
 body,
 #app {
@@ -199,6 +203,24 @@ body,
 .glass-theme .n-button .n-button__content,
 .glass-theme .n-button .n-button__icon {
   color: var(--glass-text-color) !important;
+}
+
+.glass-theme .n-input__input,
+.glass-theme .n-input__placeholder,
+.glass-theme .n-base-selection-label,
+.glass-theme .n-form-item-label__text,
+.glass-theme .n-menu-item-content,
+.glass-theme .n-menu-item-content__title,
+.glass-theme .n-data-table,
+.glass-theme .n-data-table .n-data-table-td,
+.glass-theme .n-data-table .n-data-table-th,
+.glass-theme .n-pagination,
+.glass-theme .n-alert,
+.glass-theme .n-card,
+.glass-theme .n-tag,
+.glass-theme .n-result,
+.glass-theme .n-result .n-result-header {
+  color: var(--glass-text-color);
 }
 
 .glass-theme .n-menu-item-content,

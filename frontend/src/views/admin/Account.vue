@@ -577,7 +577,7 @@ onMounted(async () => {
                 </n-button>
             </template>
         </n-modal>
-        <n-input-group style="margin-bottom: 10px;">
+        <n-input-group class="admin-account-actions" style="margin-bottom: 10px;">
             <n-input v-model:value="addressQuery" clearable :placeholder="t('addressQueryTip')"
                 @keydown.enter="fetchData" />
             <n-button @click="fetchData" type="primary" tertiary>
@@ -585,7 +585,7 @@ onMounted(async () => {
             </n-button>
         </n-input-group>
 
-        <n-space v-if="showMultiActionBar" style="margin-bottom: 10px;">
+        <n-space v-if="showMultiActionBar" class="admin-account-actions" style="margin-bottom: 10px;">
             <n-button @click="multiActionSelectAll" tertiary>
                 {{ t('selectAll') }}
             </n-button>
@@ -665,6 +665,14 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
     padding: 0;
+}
+
+.admin-account-actions :deep(.n-button) {
+    border-radius: 999px;
+}
+
+.admin-account-actions :deep(.n-button--primary) {
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
 }
 
 .n-switch :deep(.n-switch__checked),

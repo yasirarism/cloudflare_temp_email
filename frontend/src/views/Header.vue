@@ -40,12 +40,14 @@ const authFunc = async () => {
     }
 }
 
+const stripLangPrefix = (path) => {
+    const normalized = path.replace(/^\/(en|id)(?=\/|$)/, '');
+    return normalized || '/';
+}
+
 const changeLocale = async (lang) => {
-    if (lang === 'id') {
-        await router.push(route.fullPath.replace('/en', ''));
-    } else {
-        await router.push(`/${lang}${route.fullPath}`);
-    }
+    const normalizedPath = stripLangPrefix(route.fullPath);
+    await router.push(getRouterPathWithLang(normalizedPath, lang));
 }
 
 const { locale, t } = useI18n({
