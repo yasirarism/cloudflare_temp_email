@@ -23,6 +23,8 @@ const { t } = useI18n({
             actions: 'Actions',
             changeMailAddress: 'Change Mail Address',
             unbindMailAddress: 'Unbind Mail Address credential',
+            clearLocal: 'Clear Local Addresses',
+            clearLocalTip: 'Clear all locally stored addresses?',
             create_or_bind: 'Create or Bind',
             bindAddressSuccess: 'Bind Address Success',
             publicAccess: 'Public Access',
@@ -36,6 +38,8 @@ const { t } = useI18n({
             actions: 'Aksi',
             changeMailAddress: 'Ganti Alamat',
             unbindMailAddress: 'Lepas Kredensial Alamat',
+            clearLocal: 'Hapus Alamat Lokal',
+            clearLocalTip: 'Hapus semua alamat lokal?',
             create_or_bind: 'Buat atau Kaitkan',
             bindAddressSuccess: 'Berhasil mengaitkan alamat',
             publicAccess: 'Akses Publik',
@@ -133,6 +137,12 @@ const bindAddress = async () => {
     }
 }
 
+const clearLocalAddresses = () => {
+    localAddressCache.value = [];
+    publicAccessMap.value = {};
+    publicAccessLoading.value = {};
+}
+
 const columns = [
     {
         title: t('address'),
@@ -221,6 +231,12 @@ const columns = [
         <n-alert type="warning" :show-icon="false" :bordered="false">
             <span class="local-address-tip">{{ t('tip') }}</span>
         </n-alert>
+        <n-popconfirm @positive-click="clearLocalAddresses">
+            <template #trigger>
+                <n-button size="small" tertiary type="warning">{{ t('clearLocal') }}</n-button>
+            </template>
+            {{ t('clearLocalTip') }}
+        </n-popconfirm>
         <n-tabs type="segment" v-model:value="tabValue">
             <n-tab-pane name="address" :tab="t('address')">
                 <div class="table-scroll">
@@ -259,6 +275,10 @@ const columns = [
 .local-address-tip {
     display: inline-block;
     word-break: break-word;
+}
+
+.local-address-tip + :deep(.n-popconfirm) {
+    margin-top: 8px;
 }
 
 .address-cell {

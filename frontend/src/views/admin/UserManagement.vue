@@ -196,7 +196,8 @@ const changeRole = async () => {
 const columns = [
     {
         title: "ID",
-        key: "id"
+        key: "id",
+        width: 90
     },
     {
         title: t('user_email'),

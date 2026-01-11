@@ -1,6 +1,6 @@
 <script setup>
 import { ref, h, onMounted, watch, computed } from 'vue';
-import { NBadge, useMessage, NSwitch } from 'naive-ui'
+import { useMessage, NSwitch } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import { useGlobalState } from '../../store'
@@ -361,12 +361,7 @@ const columns = [
                     }
                 },
                 {
-                    icon: () => h(NBadge, {
-                        value: row.mail_count,
-                        'show-zero': true,
-                        max: 99,
-                        type: "success"
-                    }),
+                    icon: () => h('span', { class: 'count-text' }, String(row.mail_count)),
                     default: () => row.mail_count > 0 ? t('viewMails') : ""
                 }
             )
@@ -387,12 +382,7 @@ const columns = [
                     }
                 },
                 {
-                    icon: () => h(NBadge, {
-                        value: row.send_count,
-                        'show-zero': true,
-                        max: 99,
-                        type: "success"
-                    }),
+                    icon: () => h('span', { class: 'count-text' }, String(row.send_count)),
                     default: () => row.send_count > 0 ? t('viewSendBox') : ""
                 }
             )
@@ -401,6 +391,7 @@ const columns = [
     {
         title: t('publicAccess'),
         key: 'public_access',
+        width: 180,
         render(row) {
             return h(NSwitch, {
                 value: !!row.public_access,
@@ -414,6 +405,7 @@ const columns = [
     {
         title: t('actions'),
         key: 'actions',
+        width: 260,
         render(row) {
             return h('div', [
                 h(NMenu, {
@@ -650,5 +642,22 @@ onMounted(async () => {
 
 .n-data-table {
     min-width: 1000px;
+}
+
+.count-text {
+    font-weight: 600;
+}
+
+.n-switch :deep(.n-switch__checked),
+.n-switch :deep(.n-switch__unchecked) {
+    white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+    .n-menu :deep(.n-menu-item-content),
+    .n-menu :deep(.n-menu-item-content__title),
+    .n-menu :deep(.n-button__content) {
+        white-space: normal;
+    }
 }
 </style>
