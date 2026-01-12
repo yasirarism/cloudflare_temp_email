@@ -257,6 +257,7 @@ const handleSaveToS3 = async (filename, blob) => {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  color: var(--text-color-1);
 }
 
 .mail-iframe {
