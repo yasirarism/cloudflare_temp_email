@@ -1,5 +1,5 @@
 <template>
-    <div v-if="useFallback" v-html="htmlContent"></div>
+    <div v-if="useFallback" class="shadow-html-fallback" v-html="htmlContent"></div>
     <div v-else ref="shadowHost"></div>
 </template>
 
@@ -40,7 +40,22 @@ const renderShadowDom = () => {
 
         // Update content if Shadow DOM exists
         if (shadowRoot) {
-            shadowRoot.innerHTML = props.htmlContent;
+            const themedStyles = `
+                <style>
+                    :host {
+                        color: var(--text-color-1);
+                    }
+                    body {
+                        background: transparent;
+                        color: var(--text-color-1);
+                    }
+                    * {
+                        color: var(--text-color-1) !important;
+                        background-color: transparent !important;
+                    }
+                </style>
+            `;
+            shadowRoot.innerHTML = `${themedStyles}${props.htmlContent}`;
         }
     } catch (error) {
         console.error('Failed to render Shadow DOM, falling back to v-html:', error);
@@ -73,3 +88,14 @@ watch(() => props.htmlContent, () => {
     renderShadowDom();
 }, { flush: 'post' });
 </script>
+
+<style scoped>
+.shadow-html-fallback {
+    color: var(--text-color-1);
+}
+
+.shadow-html-fallback :deep(*) {
+    color: var(--text-color-1) !important;
+    background-color: transparent !important;
+}
+</style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from 'vue-i18n'
 import { CloudDownloadRound, ReplyFilled, ForwardFilled, FullscreenRound } from '@vicons/material'
 import ShadowHtmlComponent from "./ShadowHtmlComponent.vue";
@@ -8,7 +8,7 @@ import { getDownloadEmlUrl } from '../utils/email-parser';
 import { utcToLocalDate } from '../utils';
 import { useGlobalState } from '../store';
 
-const { preferShowTextMail, useIframeShowMail, useUTCDate } = useGlobalState();
+const { preferShowTextMail, useIframeShowMail, useUTCDate, isDark } = useGlobalState();
 
 const { t } = useI18n({
   messages: {
@@ -86,6 +86,33 @@ const showAttachments = ref(false);
 const curAttachments = ref([]);
 const attachmentLoding = ref(false);
 const showFullscreen = ref(false);
+const themeTextColor = ref('#222');
+
+const updateThemeTextColor = () => {
+  if (typeof window === 'undefined') return;
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--text-color-1').trim();
+  themeTextColor.value = value || '#222';
+};
+
+onMounted(updateThemeTextColor);
+watch(isDark, updateThemeTextColor);
+
+const iframeMailHtml = computed(() => {
+  if (!props.mail?.message) return '';
+  return `
+    <style>
+      html, body {
+        color: ${themeTextColor.value};
+        background: transparent;
+      }
+      * {
+        color: ${themeTextColor.value} !important;
+        background-color: transparent !important;
+      }
+    </style>
+    ${props.mail.message}
+  `;
+});
 
 const handleDelete = () => {
   props.onDelete();
@@ -186,7 +213,7 @@ const handleSaveToS3 = async (filename, blob) => {
     <!-- 邮件内容 -->
     <div class="mail-content">
       <pre v-if="showTextMail" class="mail-text">{{ mail.text }}</pre>
-      <iframe v-else-if="useIframeShowMail" :srcdoc="mail.message" class="mail-iframe">
+      <iframe v-else-if="useIframeShowMail" :srcdoc="iframeMailHtml" class="mail-iframe">
       </iframe>
       <ShadowHtmlComponent v-else :key="mail.id" :htmlContent="mail.message" class="mail-html" />
     </div>
@@ -197,7 +224,7 @@ const handleSaveToS3 = async (filename, blob) => {
     <n-drawer-content :title="mail.subject" closable>
       <div class="fullscreen-mail-content">
         <pre v-if="showTextMail" class="mail-text">{{ mail.text }}</pre>
-        <iframe v-else-if="useIframeShowMail" :srcdoc="mail.message" class="mail-iframe">
+        <iframe v-else-if="useIframeShowMail" :srcdoc="iframeMailHtml" class="mail-iframe">
         </iframe>
         <ShadowHtmlComponent v-else :key="mail.id" :htmlContent="mail.message" class="mail-html" />
       </div>
