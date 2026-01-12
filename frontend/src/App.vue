@@ -148,61 +148,6 @@ body {
     radial-gradient(circle at bottom, rgba(125, 211, 252, 0.45), transparent 60%),
     linear-gradient(135deg, var(--app-bg-start), var(--app-bg-end));
   background-attachment: fixed;
-  position: relative;
-  overflow-x: hidden;
-}
-
-body::before,
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.7;
-}
-
-body::before {
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.55) 0, rgba(255, 255, 255, 0.1) 6px, transparent 7px),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0, rgba(255, 255, 255, 0.08) 5px, transparent 6px),
-    radial-gradient(circle at 10% 80%, rgba(255, 255, 255, 0.35) 0, rgba(255, 255, 255, 0.07) 5px, transparent 6px),
-    radial-gradient(circle at 70% 75%, rgba(255, 255, 255, 0.45) 0, rgba(255, 255, 255, 0.1) 6px, transparent 7px);
-  background-size: 260px 260px;
-  animation: particle-drift 24s linear infinite;
-  filter: blur(0.5px);
-}
-
-body::after {
-  background-image:
-    radial-gradient(circle at 30% 40%, rgba(125, 211, 252, 0.35) 0, rgba(125, 211, 252, 0.05) 5px, transparent 6px),
-    radial-gradient(circle at 60% 10%, rgba(186, 230, 253, 0.35) 0, rgba(186, 230, 253, 0.06) 6px, transparent 7px),
-    radial-gradient(circle at 90% 60%, rgba(148, 163, 184, 0.3) 0, rgba(148, 163, 184, 0.05) 5px, transparent 6px),
-    radial-gradient(circle at 45% 85%, rgba(125, 211, 252, 0.28) 0, rgba(125, 211, 252, 0.04) 5px, transparent 6px);
-  background-size: 320px 320px;
-  animation: particle-drift 32s linear infinite reverse;
-  opacity: 0.55;
-}
-
-@keyframes particle-drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  50% {
-    transform: translate3d(-20px, -30px, 0);
-  }
-
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    animation: none;
-  }
 }
 
 .glass-theme {
@@ -213,11 +158,6 @@ html,
 body,
 #app {
   height: 100%;
-}
-
-#app {
-  position: relative;
-  z-index: 1;
 }
 
 .glass-shell {
