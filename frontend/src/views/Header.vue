@@ -319,67 +319,13 @@ onMounted(async () => {
 .header-shell {
     padding-top: 20px;
     position: relative;
-    overflow: hidden;
-    isolation: isolate;
+    width: 100%;
 }
 
 .n-page-header {
     padding-top: 48px;
     padding-bottom: 18px;
     position: relative;
-    z-index: 1;
-}
-
-.header-shell::before,
-.header-shell::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.7;
-}
-
-.header-shell::before {
-    background-image:
-        radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.55) 0, rgba(255, 255, 255, 0.12) 6px, transparent 7px),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0, rgba(255, 255, 255, 0.1) 5px, transparent 6px),
-        radial-gradient(circle at 10% 80%, rgba(255, 255, 255, 0.35) 0, rgba(255, 255, 255, 0.08) 5px, transparent 6px),
-        radial-gradient(circle at 70% 75%, rgba(255, 255, 255, 0.45) 0, rgba(255, 255, 255, 0.1) 6px, transparent 7px);
-    background-size: clamp(180px, 25vw, 260px) clamp(180px, 25vw, 260px);
-    filter: blur(0.4px);
-    animation: header-particle-drift 18s ease-in-out infinite;
-}
-
-.header-shell::after {
-    background-image:
-        radial-gradient(circle at 35% 40%, rgba(125, 211, 252, 0.3) 0, rgba(125, 211, 252, 0.06) 5px, transparent 6px),
-        radial-gradient(circle at 60% 10%, rgba(186, 230, 253, 0.28) 0, rgba(186, 230, 253, 0.06) 6px, transparent 7px),
-        radial-gradient(circle at 90% 60%, rgba(148, 163, 184, 0.25) 0, rgba(148, 163, 184, 0.05) 5px, transparent 6px);
-    background-size: clamp(200px, 28vw, 300px) clamp(200px, 28vw, 300px);
-    opacity: 0.55;
-    animation: header-particle-drift 24s ease-in-out infinite reverse;
-}
-
-@keyframes header-particle-drift {
-    0% {
-        transform: translate3d(0, 0, 0);
-    }
-
-    50% {
-        transform: translate3d(-12px, -18px, 0);
-    }
-
-    100% {
-        transform: translate3d(0, 0, 0);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .header-shell::before,
-    .header-shell::after {
-        animation: none;
-    }
 }
 
 .n-page-header :deep(.n-page-header__avatar),
