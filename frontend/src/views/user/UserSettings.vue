@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { startRegistration } from '@simplewebauthn/browser';
 import { NButton, NPopconfirm } from 'naive-ui'
@@ -7,7 +7,7 @@ import { NButton, NPopconfirm } from 'naive-ui'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
-const { userJwt, userSettings, } = useGlobalState()
+const { userJwt, userSettings, loading } = useGlobalState()
 const message = useMessage()
 
 const showLogout = ref(false)
@@ -17,6 +17,12 @@ const showPasskeyList = ref(false)
 const showRenamePasskey = ref(false)
 const currentPasskeyId = ref(null)
 const currentPasskeyName = ref('')
+const showApiKeyList = ref(false)
+const showCreateApiKey = ref(false)
+const showApiKeyReveal = ref(false)
+const apiKeyName = ref('')
+const apiKeyData = ref([])
+const latestApiKey = ref('')
 
 const { t } = useI18n({
     messages: {
@@ -36,6 +42,17 @@ const { t } = useI18n({
             actions: 'Actions',
             renamePasskey: 'Rename Passkey',
             renamePasskeyNamePlaceholder: 'Please enter the new passkey name',
+            apiKey: 'API Key',
+            createApiKey: 'Create API Key',
+            showApiKeyList: 'Show API Keys',
+            apiKeyNamePlaceholder: 'Please enter the API key name or leave it empty to generate a random one',
+            apiKeyCreated: 'API key created successfully',
+            apiKeyName: 'API Key Name',
+            apiKeyMasked: 'API Key (masked)',
+            lastUsedAt: 'Last Used At',
+            deleteApiKey: 'Delete API Key',
+            apiKeyRevealTitle: 'New API Key',
+            apiKeyRevealTip: 'Copy this key now. You will not be able to see it again.',
         },
         zh: {
             logout: '退出登录',
@@ -53,6 +70,17 @@ const { t } = useI18n({
             actions: '操作',
             renamePasskey: '重命名 Passkey',
             renamePasskeyNamePlaceholder: '请输入新的 Passkey 名称',
+            apiKey: 'API Key',
+            createApiKey: '创建 API Key',
+            showApiKeyList: '查看 API Key',
+            apiKeyNamePlaceholder: '请输入 API Key 名称或者留空自动生成',
+            apiKeyCreated: 'API Key 创建成功',
+            apiKeyName: 'API Key 名称',
+            apiKeyMasked: 'API Key（已隐藏）',
+            lastUsedAt: '最后使用时间',
+            deleteApiKey: '删除 API Key',
+            apiKeyRevealTitle: '新的 API Key',
+            apiKeyRevealTip: '请立即复制该 Key，之后将无法再次查看。',
         }
     }
 });
@@ -190,6 +218,90 @@ const renamePasskey = async () => {
         showRenamePasskey.value = false
     }
 }
+
+const apiKeyColumns = [
+    {
+        title: t('apiKeyName'),
+        key: "key_name"
+    },
+    {
+        title: t('apiKeyMasked'),
+        key: "api_key_masked"
+    },
+    {
+        title: t('created_at'),
+        key: "created_at"
+    },
+    {
+        title: t('lastUsedAt'),
+        key: "last_used_at"
+    },
+    {
+        title: t('actions'),
+        key: 'actions',
+        render(row) {
+            return h(NPopconfirm,
+                {
+                    onPositiveClick: async () => {
+                        try {
+                            await api.fetch(`/user_api/api_keys/${row.id}`, {
+                                method: 'DELETE'
+                            })
+                            await fetchApiKeyList()
+                        } catch (e) {
+                            console.error(e)
+                            message.error(e.message)
+                        }
+                    }
+                },
+                {
+                    trigger: () => h(NButton,
+                        {
+                            tertiary: true,
+                            type: "error",
+                        },
+                        { default: () => t('deleteApiKey') }
+                    ),
+                    default: () => `${t('deleteApiKey')}?`
+                }
+            )
+        }
+    }
+]
+
+const fetchApiKeyList = async () => {
+    try {
+        const data = await api.fetch(`/user_api/api_keys`)
+        apiKeyData.value = data
+    } catch (e) {
+        console.error(e)
+        message.error(e.message)
+    }
+}
+
+const createApiKey = async () => {
+    try {
+        const data = await api.fetch(`/user_api/api_keys`, {
+            method: 'POST',
+            body: JSON.stringify({
+                key_name: apiKeyName.value || (
+                    (window.navigator.userAgentData?.platform || "Unknown")
+                    + ": " + Math.random().toString(36).substring(7)
+                )
+            })
+        })
+        latestApiKey.value = data.api_key
+        showApiKeyReveal.value = true
+        message.success(t('apiKeyCreated'))
+        await fetchApiKeyList()
+    } catch (e) {
+        console.error(e)
+        message.error(e.message)
+    } finally {
+        apiKeyName.value = ''
+        showCreateApiKey.value = false
+    }
+}
 </script>
 
 <template>
@@ -200,6 +312,12 @@ const renamePasskey = async () => {
             </n-button>
             <n-button @click="showCreatePasskey = true" type="primary" secondary block strong>
                 {{ t('createPasskey') }}
+            </n-button>
+            <n-button @click="showApiKeyList = true; fetchApiKeyList();" secondary block strong>
+                {{ t('showApiKeyList') }}
+            </n-button>
+            <n-button @click="showCreateApiKey = true" type="primary" secondary block strong>
+                {{ t('createApiKey') }}
             </n-button>
             <n-alert :show-icon="false" :bordered="false">
                 <span>
@@ -228,6 +346,23 @@ const renamePasskey = async () => {
         </n-modal>
         <n-modal v-model:show="showPasskeyList" preset="card" :title="t('showPasskeyList')">
             <n-data-table :columns="passkeyColumns" :data="passkeyData" :bordered="false" embedded />
+        </n-modal>
+        <n-modal v-model:show="showCreateApiKey" preset="dialog" :title="t('createApiKey')">
+            <n-input v-model:value="apiKeyName" :placeholder="t('apiKeyNamePlaceholder')" />
+            <template #action>
+                <n-button :loading="loading" @click="createApiKey" size="small" tertiary type="primary">
+                    {{ t('createApiKey') }}
+                </n-button>
+            </template>
+        </n-modal>
+        <n-modal v-model:show="showApiKeyList" preset="card" :title="t('showApiKeyList')">
+            <n-data-table :columns="apiKeyColumns" :data="apiKeyData" :bordered="false" embedded />
+        </n-modal>
+        <n-modal v-model:show="showApiKeyReveal" preset="dialog" :title="t('apiKeyRevealTitle')">
+            <n-alert :show-icon="false" :bordered="false">
+                {{ t('apiKeyRevealTip') }}
+            </n-alert>
+            <n-input :value="latestApiKey" readonly />
         </n-modal>
         <n-modal v-model:show="showLogout" preset="dialog" :title="t('logout')">
             <p>{{ t('logoutConfirm') }}</p>

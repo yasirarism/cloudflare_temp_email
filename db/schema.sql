@@ -118,4 +118,16 @@ CREATE TABLE IF NOT EXISTS user_passkeys (
 
 CREATE INDEX IF NOT EXISTS idx_user_passkeys_user_id ON user_passkeys(user_id);
 
+CREATE TABLE IF NOT EXISTS user_api_keys (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    key_name TEXT NOT NULL,
+    api_key TEXT NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_used_at DATETIME
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_api_keys_user_id ON user_api_keys(user_id);
+
 CREATE UNIQUE INDEX IF NOT EXISTS idx_user_passkeys_user_id_passkey_id ON user_passkeys(user_id, passkey_id);

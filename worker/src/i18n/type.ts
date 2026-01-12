@@ -104,6 +104,8 @@ export type LocaleMessages = {
     // Bind address related
     NoAddressOrUserTokenMsg: string
     InvalidAddressOrUserTokenMsg: string
+    InvalidApiKeyNameMsg: string
+    InvalidApiKeyMsg: string
 
     // Pagination related
     InvalidLimitMsg: string

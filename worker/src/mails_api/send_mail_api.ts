@@ -256,14 +256,46 @@ api.post('/api/send_mail', async (c) => {
 
 api.post('/external/api/send_mail', async (c) => {
     const msgs = i18n.getMessagesbyContext(c);
-    const { token } = await c.req.json();
+    const reqJson = await c.req.json();
+    const { token, api_key, address } = reqJson;
     try {
-        const { address } = await Jwt.verify(token, c.env.JWT_SECRET, "HS256");
-        if (!address) {
+        let sendAddress = "";
+        if (token) {
+            const payload = await Jwt.verify(token, c.env.JWT_SECRET, "HS256");
+            sendAddress = payload.address as string;
+        } else if (api_key) {
+            if (!address) {
+                return c.text(msgs.AddressNotFoundMsg, 400)
+            }
+            const apiKeyRecord = await c.env.DB.prepare(
+                `SELECT user_id FROM user_api_keys WHERE api_key = ?`
+            ).bind(api_key).first<{ user_id: number }>();
+            if (!apiKeyRecord?.user_id) {
+                return c.text(msgs.InvalidApiKeyMsg, 401)
+            }
+            const normalizedAddress = address.toLowerCase();
+            const userAddress = await c.env.DB.prepare(
+                `SELECT a.name FROM address a
+                JOIN users_address ua ON ua.address_id = a.id
+                WHERE ua.user_id = ? AND a.name = ?`
+            ).bind(apiKeyRecord.user_id, normalizedAddress).first<{ name: string }>();
+            if (!userAddress?.name) {
+                return c.text(msgs.AddressNotBindedMsg, 403)
+            }
+            sendAddress = userAddress.name;
+            await c.env.DB.prepare(
+                `UPDATE user_api_keys
+                SET last_used_at = datetime('now'), updated_at = datetime('now')
+                WHERE api_key = ?`
+            ).bind(api_key).run();
+        } else {
+            return c.text(msgs.InvalidApiKeyMsg, 401)
+        }
+        if (!sendAddress) {
             return c.text(msgs.AddressNotFoundMsg, 400)
         }
-        const reqJson = await c.req.json();
-        await sendMail(c, address as string, reqJson);
+        const { token: _token, api_key: _apiKey, address: _address, ...mailPayload } = reqJson;
+        await sendMail(c, sendAddress, mailPayload);
         return c.json({ status: "ok" })
     } catch (e) {
         console.error("Failed to send mail", e);

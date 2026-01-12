@@ -268,7 +268,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="header-shell">
+    <div class="header-shell glass-panel">
         <n-page-header>
             <template #title>
                 <h4 class="header-title">{{ openSettings.title || t('title') }}</h4>

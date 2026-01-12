@@ -106,6 +106,8 @@ const messages: LocaleMessages = {
     // Bind address related
     NoAddressOrUserTokenMsg: "缺少地址或用户令牌",
     InvalidAddressOrUserTokenMsg: "无效的地址或用户令牌",
+    InvalidApiKeyNameMsg: "无效的 API Key 名称",
+    InvalidApiKeyMsg: "无效的 API Key",
 
     // Pagination related
     InvalidLimitMsg: "无效的 limit 参数",

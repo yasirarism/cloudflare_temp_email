@@ -106,6 +106,8 @@ const messages: LocaleMessages = {
     // Bind address related
     NoAddressOrUserTokenMsg: "No address or user token",
     InvalidAddressOrUserTokenMsg: "Invalid address or user token",
+    InvalidApiKeyNameMsg: "Invalid API key name",
+    InvalidApiKeyMsg: "Invalid API key",
 
     // Pagination related
     InvalidLimitMsg: "Invalid limit",
