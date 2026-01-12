@@ -348,6 +348,7 @@ onMounted(async () => {
         radial-gradient(circle at 70% 75%, rgba(255, 255, 255, 0.45) 0, rgba(255, 255, 255, 0.1) 6px, transparent 7px);
     background-size: clamp(180px, 25vw, 260px) clamp(180px, 25vw, 260px);
     filter: blur(0.4px);
+    animation: header-particle-drift 18s ease-in-out infinite;
 }
 
 .header-shell::after {
@@ -357,6 +358,28 @@ onMounted(async () => {
         radial-gradient(circle at 90% 60%, rgba(148, 163, 184, 0.25) 0, rgba(148, 163, 184, 0.05) 5px, transparent 6px);
     background-size: clamp(200px, 28vw, 300px) clamp(200px, 28vw, 300px);
     opacity: 0.55;
+    animation: header-particle-drift 24s ease-in-out infinite reverse;
+}
+
+@keyframes header-particle-drift {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    50% {
+        transform: translate3d(-12px, -18px, 0);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .header-shell::before,
+    .header-shell::after {
+        animation: none;
+    }
 }
 
 .n-page-header :deep(.n-page-header__avatar),
