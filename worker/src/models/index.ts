@@ -32,6 +32,8 @@ export type WebhookMail = {
     raw: string;
     parsedText: string;
     parsedHtml: string;
+    text?: string;
+    html?: string;
 }
 
 export type CustomSqlCleanup = {
@@ -141,6 +143,8 @@ export class WebhookSettings {
         "to": "${to}",
         "subject": "${subject}",
         "raw": "${raw}",
+        "text": "${text}",
+        "html": "${html}",
         "parsedText": "${parsedText}",
         "parsedHtml": "${parsedHtml}",
     }, null, 2)

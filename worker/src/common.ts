@@ -526,7 +526,7 @@ export async function sendWebhook(
     settings: WebhookSettings, formatMap: WebhookMail
 ): Promise<{ success: boolean, message?: string }> {
     // send webhook
-    let body = settings.body;
+    let body = settings.body || "";
     for (const key of Object.keys(formatMap)) {
         body = body.replace(
             new RegExp(`\\$\\{${key}\\}`, "g"),
@@ -535,9 +535,20 @@ export async function sendWebhook(
             ).replace(/^"(.*)"$/, '$1')
         );
     }
+    let headers: Record<string, string> = {};
+    if (settings.headers) {
+        try {
+            const parsedHeaders = JSON.parse(settings.headers);
+            if (parsedHeaders && typeof parsedHeaders === "object") {
+                headers = parsedHeaders;
+            }
+        } catch (error) {
+            console.log("send webhook headers parse error", error);
+        }
+    }
     const response = await fetch(settings.url, {
         method: settings.method,
-        headers: JSON.parse(settings.headers),
+        headers: headers,
         body: body
     });
     if (!response.ok) {
@@ -603,6 +614,8 @@ export async function triggerWebhook(
         to: address,
         subject: parsedEmail?.subject || "",
         raw: parsedEmailContext.rawEmail || "",
+        text: parsedEmail?.text || "",
+        html: parsedEmail?.html || "",
         parsedText: parsedEmail?.text || "",
         parsedHtml: parsedEmail?.html || ""
     }

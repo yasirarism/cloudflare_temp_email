@@ -26,6 +26,9 @@ async function testWebhookSettings(c: Context<HonoCustomType>): Promise<Response
             settings.url = routeUrl;
         }
     }
+    if (!settings.url) {
+        return c.text("Webhook URL is required", 400);
+    }
     // random raw email
     const { id: mailId, raw } = await c.env.DB.prepare(
         `SELECT id, raw FROM raw_mails ORDER BY RANDOM() LIMIT 1`
@@ -39,6 +42,8 @@ async function testWebhookSettings(c: Context<HonoCustomType>): Promise<Response
         to: "admin@test.com",
         subject: parsedEmail?.subject || "test subject",
         raw: raw || "test raw email",
+        text: parsedEmail?.text || "test parsed text",
+        html: parsedEmail?.html || "test parsed html",
         parsedText: parsedEmail?.text || "test parsed text",
         parsedHtml: parsedEmail?.html || "test parsed html"
     });
