@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 // @ts-ignore
 import { api } from '../../api'
 
 // @ts-ignore
 import WebhookComponent from '../../components/WebhookComponent.vue'
+import { useGlobalState } from '../../store'
+
+const { openSettings } = useGlobalState()
+const domainOptions = computed(() => openSettings.value.domains || [])
 
 const fetchData = async () => {
     return await api.fetch(`/admin/mail_webhook/settings`)
@@ -26,5 +31,6 @@ const testSettings = async (webhookSettings: any) => {
 </script>
 
 <template>
-    <WebhookComponent :fetchData="fetchData" :saveSettings="saveSettings" :testSettings="testSettings" />
+    <WebhookComponent :fetchData="fetchData" :saveSettings="saveSettings" :testSettings="testSettings"
+        :showDomainFilter="true" :domainOptions="domainOptions" />
 </template>

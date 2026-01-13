@@ -128,6 +128,7 @@ export class UserInfo {
 export class WebhookSettings {
     enabled: boolean = false
     url: string = ''
+    domains: string[] = []
     method: string = 'POST'
     headers: string = JSON.stringify({
         "Content-Type": "application/json"

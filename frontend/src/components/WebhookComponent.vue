@@ -18,6 +18,14 @@ const props = defineProps({
         default: (webhookSettings: WebhookSettings) => { },
         required: true
     },
+    showDomainFilter: {
+        type: Boolean,
+        default: false
+    },
+    domainOptions: {
+        type: Array,
+        default: () => []
+    },
 })
 
 // @ts-ignore
@@ -35,6 +43,8 @@ const { t } = useI18n({
             messagePusherDemo: 'Fill with Message Pusher Demo',
             messagePusherDoc: 'Message Pusher Doc',
             fillInDemoTip: 'Please modify the URL and other settings to your own',
+            domainFilter: 'Webhook Domains (Optional)',
+            domainFilterPlaceholder: 'Select domains to receive webhooks',
         },
         zh: {
             successTip: '成功',
@@ -46,6 +56,8 @@ const { t } = useI18n({
             messagePusherDemo: '填入MessagePusher示例',
             messagePusherDoc: 'MessagePusher文档',
             fillInDemoTip: '请修改URL和其他设置为您自己的配置',
+            domainFilter: 'Webhook 域名（可选）',
+            domainFilterPlaceholder: '选择接收 webhook 的域名',
         }
     }
 });
@@ -53,6 +65,7 @@ const { t } = useI18n({
 class WebhookSettings {
     enabled: boolean = false
     url: string = ''
+    domains: string[] = []
     method: string = 'POST'
     headers: string = JSON.stringify({}, null, 2)
     body: string = JSON.stringify({}, null, 2)
@@ -145,6 +158,10 @@ onMounted(async () => {
                 <n-switch v-model:value="webhookSettings.enabled" :round="false" />
             </n-form-item-row>
             <div v-if="webhookSettings.enabled">
+                <n-form-item-row v-if="props.showDomainFilter" :label="t('domainFilter')">
+                    <n-select v-model:value="webhookSettings.domains" multiple filterable tag
+                        :options="props.domainOptions" :placeholder="t('domainFilterPlaceholder')" />
+                </n-form-item-row>
                 <n-form-item-row label="URL">
                     <n-input v-model:value="webhookSettings.url" />
                 </n-form-item-row>
