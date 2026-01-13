@@ -561,11 +561,18 @@ export async function sendWebhook(
     if (!hasContentType) {
         headers["Content-Type"] = "application/json";
     }
-    const response = await fetch(settings.url, {
-        method: settings.method,
-        headers: headers,
-        body: body
-    });
+    let response: Response;
+    try {
+        response = await fetch(settings.url, {
+            method: settings.method,
+            headers: headers,
+            body: body
+        });
+    } catch (error) {
+        console.log("send webhook error", settings.url, settings.method, settings.headers, body);
+        console.log("send webhook error", error);
+        return { success: false, message: `send webhook error: ${error}` };
+    }
     if (!response.ok) {
         console.log("send webhook error", settings.url, settings.method, settings.headers, body);
         console.log("send webhook error", response.status, response.statusText);
