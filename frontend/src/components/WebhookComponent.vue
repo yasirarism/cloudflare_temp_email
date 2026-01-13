@@ -18,7 +18,7 @@ const props = defineProps({
         default: (webhookSettings: WebhookSettings) => { },
         required: true
     },
-    showDomainFilter: {
+    showDomainRoutes: {
         type: Boolean,
         default: false
     },
@@ -43,8 +43,12 @@ const { t } = useI18n({
             messagePusherDemo: 'Fill with Message Pusher Demo',
             messagePusherDoc: 'Message Pusher Doc',
             fillInDemoTip: 'Please modify the URL and other settings to your own',
-            domainFilter: 'Webhook Domains (Optional)',
-            domainFilterPlaceholder: 'Select domains to receive webhooks',
+            domainRoutes: 'Webhook Domain Routes (Optional)',
+            domainRouteDomain: 'Select a domain',
+            domainRouteUrl: 'Enter webhook URL',
+            domainRouteAdd: 'Add Domain Route',
+            domainRouteRemove: 'Remove',
+            domainRouteMissing: 'Each domain route needs a domain and URL',
         },
         zh: {
             successTip: '成功',
@@ -56,8 +60,12 @@ const { t } = useI18n({
             messagePusherDemo: '填入MessagePusher示例',
             messagePusherDoc: 'MessagePusher文档',
             fillInDemoTip: '请修改URL和其他设置为您自己的配置',
-            domainFilter: 'Webhook 域名（可选）',
-            domainFilterPlaceholder: '选择接收 webhook 的域名',
+            domainRoutes: 'Webhook 域名路由（可选）',
+            domainRouteDomain: '选择域名',
+            domainRouteUrl: '输入 Webhook URL',
+            domainRouteAdd: '新增域名路由',
+            domainRouteRemove: '移除',
+            domainRouteMissing: '每个域名路由都需要域名和 URL',
         }
     }
 });
@@ -66,6 +74,7 @@ class WebhookSettings {
     enabled: boolean = false
     url: string = ''
     domains: string[] = []
+    domainRoutes: { domain: string; url: string }[] = []
     method: string = 'POST'
     headers: string = JSON.stringify({}, null, 2)
     body: string = JSON.stringify({}, null, 2)
@@ -100,15 +109,45 @@ const fetchData = async () => {
     try {
         const res = await props.fetchData()
         Object.assign(webhookSettings.value, res)
+        if (!Array.isArray(webhookSettings.value.domainRoutes)) {
+            webhookSettings.value.domainRoutes = []
+        }
         enableWebhook.value = true
     } catch (error) {
         message.error((error as Error).message || "error");
     }
 }
 
+const addDomainRoute = () => {
+    webhookSettings.value.domainRoutes.push({ domain: '', url: '' })
+}
+
+const removeDomainRoute = (index: number) => {
+    webhookSettings.value.domainRoutes.splice(index, 1)
+}
+
+const validateDomainRoutes = () => {
+    if (!props.showDomainRoutes) {
+        return true
+    }
+    if (!webhookSettings.value.domainRoutes?.length) {
+        return true
+    }
+    const hasInvalidRoute = webhookSettings.value.domainRoutes.some(route => !route.domain || !route.url)
+    if (hasInvalidRoute) {
+        message.error(t('domainRouteMissing'))
+        return false
+    }
+    return true
+}
+
 const saveSettings = async () => {
-    if (!webhookSettings.value.url) {
+    const hasDomainRoutes = webhookSettings.value.domainRoutes?.length
+    if (!webhookSettings.value.url && !hasDomainRoutes) {
         message.error(t('urlMissing'))
+        return
+    }
+    if (!validateDomainRoutes()) {
         return
     }
     try {
@@ -120,8 +159,12 @@ const saveSettings = async () => {
 }
 
 const testSettings = async () => {
-    if (!webhookSettings.value.url) {
+    const hasDomainRoutes = webhookSettings.value.domainRoutes?.length
+    if (!webhookSettings.value.url && !hasDomainRoutes) {
         message.error(t('urlMissing'))
+        return
+    }
+    if (!validateDomainRoutes()) {
         return
     }
     try {
@@ -158,9 +201,22 @@ onMounted(async () => {
                 <n-switch v-model:value="webhookSettings.enabled" :round="false" />
             </n-form-item-row>
             <div v-if="webhookSettings.enabled">
-                <n-form-item-row v-if="props.showDomainFilter" :label="t('domainFilter')">
-                    <n-select v-model:value="webhookSettings.domains" multiple filterable tag
-                        :options="props.domainOptions" :placeholder="t('domainFilterPlaceholder')" />
+                <n-form-item-row v-if="props.showDomainRoutes" :label="t('domainRoutes')">
+                    <n-flex vertical style="width: 100%;">
+                        <div v-for="(route, index) in webhookSettings.domainRoutes" :key="index"
+                            class="domain-route-row">
+                            <n-select v-model:value="route.domain" filterable tag :options="props.domainOptions"
+                                :placeholder="t('domainRouteDomain')" class="domain-route-domain" />
+                            <n-input v-model:value="route.url" :placeholder="t('domainRouteUrl')"
+                                class="domain-route-url" />
+                            <n-button tertiary @click="removeDomainRoute(index)">
+                                {{ t('domainRouteRemove') }}
+                            </n-button>
+                        </div>
+                        <n-button secondary @click="addDomainRoute">
+                            {{ t('domainRouteAdd') }}
+                        </n-button>
+                    </n-flex>
                 </n-form-item-row>
                 <n-form-item-row label="URL">
                     <n-input v-model:value="webhookSettings.url" />
@@ -192,5 +248,21 @@ onMounted(async () => {
 
 .n-button {
     margin-top: 10px;
+}
+
+.domain-route-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+}
+
+.domain-route-domain {
+    min-width: 200px;
+    flex: 1;
+}
+
+.domain-route-url {
+    flex: 2;
 }
 </style>

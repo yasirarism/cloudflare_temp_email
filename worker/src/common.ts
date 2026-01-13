@@ -563,8 +563,15 @@ export async function triggerWebhook(
     const adminMailWebhookSettings = await c.env.KV.get<WebhookSettings>(CONSTANTS.WEBHOOK_KV_ADMIN_MAIL_SETTINGS_KEY, "json");
     if (adminMailWebhookSettings?.enabled) {
         const adminDomains = adminMailWebhookSettings.domains || [];
+        const adminRoutes = adminMailWebhookSettings.domainRoutes || [];
         const [, addressDomain] = address.split("@");
-        if (adminDomains.length === 0 || (addressDomain && adminDomains.includes(addressDomain))) {
+        if (adminRoutes.length > 0 && addressDomain) {
+            for (const route of adminRoutes) {
+                if (route.domain === addressDomain && route.url) {
+                    webhookList.push({ ...adminMailWebhookSettings, url: route.url })
+                }
+            }
+        } else if (adminDomains.length === 0 || (addressDomain && adminDomains.includes(addressDomain))) {
             webhookList.push(adminMailWebhookSettings)
         }
     }

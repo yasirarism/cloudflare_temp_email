@@ -20,6 +20,12 @@ async function saveWebhookSettings(c: Context<HonoCustomType>): Promise<Response
 
 async function testWebhookSettings(c: Context<HonoCustomType>): Promise<Response> {
     const settings = await c.req.json<WebhookSettings>();
+    if (!settings.url && settings.domainRoutes?.length) {
+        const routeUrl = settings.domainRoutes.find(route => route.url)?.url;
+        if (routeUrl) {
+            settings.url = routeUrl;
+        }
+    }
     // random raw email
     const { id: mailId, raw } = await c.env.DB.prepare(
         `SELECT id, raw FROM raw_mails ORDER BY RANDOM() LIMIT 1`

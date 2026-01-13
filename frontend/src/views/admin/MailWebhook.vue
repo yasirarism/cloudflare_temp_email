@@ -32,5 +32,5 @@ const testSettings = async (webhookSettings: any) => {
 
 <template>
     <WebhookComponent :fetchData="fetchData" :saveSettings="saveSettings" :testSettings="testSettings"
-        :showDomainFilter="true" :domainOptions="domainOptions" />
+        :showDomainRoutes="true" :domainOptions="domainOptions" />
 </template>
