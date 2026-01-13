@@ -525,6 +525,9 @@ export const getAllowDomains = async (c: Context<HonoCustomType>): Promise<strin
 export async function sendWebhook(
     settings: WebhookSettings, formatMap: WebhookMail
 ): Promise<{ success: boolean, message?: string }> {
+    if (!settings.url) {
+        return { success: false, message: "webhook url is required" };
+    }
     // send webhook
     let body = settings.body || "";
     for (const key of Object.keys(formatMap)) {
@@ -561,20 +564,23 @@ export async function sendWebhook(
     if (!hasContentType) {
         headers["Content-Type"] = "application/json";
     }
+    const method = settings.method || "POST";
+    const request = new Request(settings.url.trim(), {
+        method,
+        headers: new Headers(headers),
+        body,
+        redirect: "follow"
+    });
     let response: Response;
     try {
-        response = await fetch(settings.url, {
-            method: settings.method,
-            headers: headers,
-            body: body
-        });
+        response = await fetch(request);
     } catch (error) {
-        console.log("send webhook error", settings.url, settings.method, settings.headers, body);
+        console.log("send webhook error", settings.url, method, settings.headers, body);
         console.log("send webhook error", error);
         return { success: false, message: `send webhook error: ${error}` };
     }
     if (!response.ok) {
-        console.log("send webhook error", settings.url, settings.method, settings.headers, body);
+        console.log("send webhook error", settings.url, method, settings.headers, body);
         console.log("send webhook error", response.status, response.statusText);
         return { success: false, message: `send webhook error: ${response.status} ${response.statusText}` };
     }
