@@ -546,6 +546,21 @@ export async function sendWebhook(
             console.log("send webhook headers parse error", error);
         }
     }
+    if (!body.trim()) {
+        body = JSON.stringify({
+            from: formatMap.from,
+            to: formatMap.to,
+            subject: formatMap.subject,
+            text: formatMap.text || formatMap.parsedText || "",
+            html: formatMap.html || formatMap.parsedHtml || "",
+        });
+    }
+    const hasContentType = Object.keys(headers).some(
+        (key) => key.toLowerCase() === "content-type"
+    );
+    if (!hasContentType) {
+        headers["Content-Type"] = "application/json";
+    }
     const response = await fetch(settings.url, {
         method: settings.method,
         headers: headers,
