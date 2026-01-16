@@ -269,6 +269,8 @@ const handleSaveToS3 = async (filename, blob) => {
 .mail-html {
   width: 100%;
   height: 100%;
+  color: #111;
+  background: #fff;
 }
 
 .center {
