@@ -75,7 +75,7 @@ const timer = ref(null)
 const realtimeTimer = ref(null)
 const latestMailId = ref(null)
 const processedCache = new Map()
-const realtimeIntervalMs = 5000
+const realtimeIntervalMs = 2000
 
 const count = ref(0)
 const page = ref(1)
