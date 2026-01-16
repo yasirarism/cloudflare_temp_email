@@ -301,7 +301,7 @@ const backFirstPageAndRefresh = async ({ showLoading = true, preserveSelection =
 }
 
 const checkForNewMail = async () => {
-  if (!props.enableRealtime || autoRefresh.value || mailLoading.value || page.value !== 1) {
+  if (!props.enableRealtime || mailLoading.value || page.value !== 1) {
     return;
   }
   try {
@@ -321,7 +321,7 @@ const checkForNewMail = async () => {
 const startRealtime = () => {
   clearInterval(realtimeTimer.value);
   realtimeTimer.value = null;
-  if (!props.enableRealtime || autoRefresh.value) {
+  if (!props.enableRealtime) {
     return;
   }
   realtimeTimer.value = setInterval(checkForNewMail, realtimeIntervalMs);
