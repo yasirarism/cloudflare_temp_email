@@ -118,25 +118,27 @@ onMounted(async () => {
 
 <style>
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
-  --glass-selection-bg: rgba(255, 255, 255, 0.5);
-  --glass-backdrop-blur: 18px;
-  --glass-button-bg: rgba(255, 255, 255, 0.65);
-  --glass-button-border: rgba(255, 255, 255, 0.75);
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-highlight: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+  --glass-selection-bg: rgba(255, 255, 255, 0.6);
+  --glass-backdrop-blur: 22px;
+  --glass-button-bg: rgba(255, 255, 255, 0.75);
+  --glass-button-border: rgba(255, 255, 255, 0.9);
   --glass-text-color: #0f172a;
   --app-bg-start: #e0f2fe;
   --app-bg-end: #f1f5f9;
 }
 
 .dark {
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(148, 163, 184, 0.25);
-  --glass-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
-  --glass-selection-bg: rgba(30, 41, 59, 0.55);
-  --glass-button-bg: rgba(30, 41, 59, 0.7);
-  --glass-button-border: rgba(148, 163, 184, 0.25);
+  --glass-bg: rgba(15, 23, 42, 0.5);
+  --glass-highlight: rgba(30, 41, 59, 0.75);
+  --glass-border: rgba(148, 163, 184, 0.35);
+  --glass-shadow: 0 20px 45px rgba(2, 6, 23, 0.6);
+  --glass-selection-bg: rgba(30, 41, 59, 0.6);
+  --glass-button-bg: rgba(30, 41, 59, 0.75);
+  --glass-button-border: rgba(148, 163, 184, 0.35);
   --glass-text-color: #f8fafc;
   --app-bg-start: #0f172a;
   --app-bg-end: #111827;
@@ -184,7 +186,7 @@ body,
 .glass-theme .n-notification,
 .glass-theme .n-dialog,
 .glass-theme .n-base-selection {
-  background: var(--glass-bg) !important;
+  background: linear-gradient(135deg, var(--glass-highlight), var(--glass-bg)) !important;
   border: 1px solid var(--glass-border) !important;
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
@@ -273,7 +275,7 @@ body,
 }
 
 .glass-panel {
-  background: var(--glass-bg);
+  background: linear-gradient(135deg, var(--glass-highlight), var(--glass-bg));
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));

@@ -75,7 +75,7 @@ const timer = ref(null)
 const realtimeTimer = ref(null)
 const latestMailId = ref(null)
 const processedCache = new Map()
-const realtimeIntervalMs = 5000
+const realtimeIntervalMs = 2000
 
 const count = ref(0)
 const page = ref(1)
@@ -247,13 +247,26 @@ const refresh = async ({ showLoading = true, preserveSelection = true } = {}) =>
     mailLoading.value = true;
   }
   try {
+    const previousIds = new Set(rawData.value.map((item) => item.id));
     const { results, count: totalCount } = await props.fetchMailData(
       pageSize.value, (page.value - 1) * pageSize.value
     );
     const processedResults = await Promise.all(
       results.map(async (item) => buildProcessedItem(item))
     );
-    rawData.value = processedResults;
+    const shouldMarkNew = !!latestMailId.value && page.value === 1;
+    const updatedResults = processedResults.map((item) => ({
+      ...item,
+      isNew: shouldMarkNew && !previousIds.has(item.id),
+    }));
+    rawData.value = updatedResults;
+    if (shouldMarkNew && updatedResults.some((item) => item.isNew)) {
+      setTimeout(() => {
+        rawData.value = rawData.value.map((item) =>
+          item.isNew ? { ...item, isNew: false } : item
+        );
+      }, 1800);
+    }
     if (typeof totalCount === 'number' && totalCount >= 0) {
       count.value = totalCount;
     }
@@ -288,7 +301,7 @@ const backFirstPageAndRefresh = async ({ showLoading = true, preserveSelection =
 }
 
 const checkForNewMail = async () => {
-  if (!props.enableRealtime || autoRefresh.value || mailLoading.value || page.value !== 1) {
+  if (!props.enableRealtime || mailLoading.value || page.value !== 1) {
     return;
   }
   try {
@@ -308,7 +321,7 @@ const checkForNewMail = async () => {
 const startRealtime = () => {
   clearInterval(realtimeTimer.value);
   realtimeTimer.value = null;
-  if (!props.enableRealtime || autoRefresh.value) {
+  if (!props.enableRealtime) {
     return;
   }
   realtimeTimer.value = setInterval(checkForNewMail, realtimeIntervalMs);
@@ -542,7 +555,7 @@ onBeforeUnmount(() => {
           <div style="overflow: auto; min-height: 50vh; max-height: 100vh;">
             <n-list hoverable clickable class="glass-panel">
             <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
-              :class="mailItemClass(row)">
+              :class="[mailItemClass(row), { 'mail-item-new': row.isNew }]">
                 <template #prefix v-if="multiActionMode">
                   <n-checkbox v-model:checked="row.checked" />
                 </template>
@@ -627,7 +640,7 @@ onBeforeUnmount(() => {
       <div style="overflow: auto; height: 80vh;">
         <n-list hoverable clickable class="glass-panel">
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
-            :class="mailItemClass(row)">
+            :class="[mailItemClass(row), { 'mail-item-new': row.isNew }]">
             <n-thing :title="row.subject">
               <template #description>
                 <n-tag type="info">
@@ -698,7 +711,7 @@ onBeforeUnmount(() => {
 }
 
 .glass-panel {
-  background: var(--glass-bg);
+  background: linear-gradient(135deg, var(--glass-highlight), var(--glass-bg));
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(var(--glass-backdrop-blur));
@@ -721,6 +734,26 @@ onBeforeUnmount(() => {
 .mail-item-selected :deep(.n-list-item__content),
 .mail-item-selected :deep(.n-list-item__main) {
   background: var(--glass-selection-bg);
+}
+
+.mail-item-new {
+  animation: mail-item-pop 1.2s ease;
+}
+
+.mail-item-new :deep(.n-list-item__content),
+.mail-item-new :deep(.n-list-item__main) {
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.35), var(--glass-selection-bg));
+}
+
+@keyframes mail-item-pop {
+  0% {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(59, 130, 246, 0.25);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: var(--glass-shadow);
+  }
 }
 
 .glass-input {
